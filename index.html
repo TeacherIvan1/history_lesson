@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Winter Challenge - Teacher Ivan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --azul-primario: #0A468C; 
+            --naranja-vibrante: #F56E1E; 
+            --azul-claro: #96C8E6; 
+            --gris-neutro: #C8CDD2; 
+            --blanco-nieve: #FAFAF0; 
+            --blanco-puro: #FFFFFF;
+            --font-titulares: 'Montserrat', sans-serif; 
+            --font-cuerpo: 'Open Sans', sans-serif; 
+        }
+
+        body { font-family: var(--font-cuerpo); background-color: var(--blanco-nieve); color: var(--azul-primario); }
+        h1, h2, h3, h4 { font-family: var(--font-titulares); }
+
+        .loader {
+            border: 4px solid var(--gris-neutro);
+            border-top: 4px solid var(--naranja-vibrante);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .quiz-option {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            background-color: var(--blanco-puro);
+            border: 2px solid var(--azul-claro);
+            color: var(--azul-primario);
+        }
+        .quiz-option:hover { border-color: var(--naranja-vibrante); }
+        .quiz-option.selected {
+            background-color: var(--azul-primario);
+            border-color: var(--azul-primario);
+            color: var(--blanco-puro);
+        }
+        
+        #error-msg { display: none; color: #ef4444; font-weight: 600; margin-top: 10px; }
+        
+        /* Ocultar secciones dinámicamente */
+        .screen { display: none; }
+        .screen.active { display: block; animation: fadeIn 0.5s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+
+    <header class="bg-[#0A468C] text-white p-4 shadow-md sticky top-0 z-10">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <span class="material-icons-round text-3xl text-[#F56E1E]">ac_unit</span>
+                <h1 class="text-xl md:text-2xl font-extrabold tracking-wide">Winter Challenge</h1>
+            </div>
+            <div class="text-sm font-semibold hidden md:block">Colegio Fielding • Teacher Ivan</div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-4">
+        
+        <div id="login-screen" class="screen active max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-[#C8CDD2]">
+            <h2 class="text-2xl font-bold mb-2 text-center text-[#0A468C]">Registro Diario</h2>
+            <p class="text-center text-sm text-gray-500 mb-6">Ingresa tu código de estudiante para acceder a las preguntas de hoy.</p>
+            
+            <input type="text" id="codigo-input" placeholder="Ej: 1RO-06" class="w-full text-center uppercase font-bold text-xl p-4 border-2 border-[#96C8E6] rounded-xl focus:outline-none focus:border-[#F56E1E] transition mb-4">
+            
+            <button onclick="login()" id="btn-login" class="w-full bg-[#F56E1E] hover:bg-[#d65d18] text-white font-bold py-4 rounded-xl shadow-lg transition text-lg">
+                Iniciar Misión Diaria
+            </button>
+            <div id="login-loader" class="loader" style="display: none;"></div>
+            <p id="error-msg" class="text-center"></p>
+        </div>
+
+        <div id="quiz-screen" class="screen max-w-3xl w-full bg-white rounded-2xl shadow-xl p-6 md:p-10 border border-[#C8CDD2]">
+            <div class="flex justify-between items-center mb-6 border-b pb-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-[#0A468C]" id="student-name">Hola, Estudiante</h2>
+                    <p class="text-sm font-semibold text-[#F56E1E]" id="student-course">Curso</p>
+                </div>
+                <div class="bg-[#96C8E6] text-[#0A468C] px-4 py-2 rounded-lg font-bold">
+                    Día: <span id="current-day">0</span> de Julio
+                </div>
+            </div>
+
+            <div id="quiz-container" class="space-y-8">
+                </div>
+
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <button onclick="submitQuiz()" id="btn-submit" class="w-full bg-[#0A468C] hover:bg-blue-800 text-white font-bold py-4 rounded-xl shadow-lg transition text-lg">
+                    Verificar y Registrar Asistencia
+                </button>
+                <div id="quiz-loader" class="loader" style="display: none;"></div>
+                <p id="quiz-error" class="text-center mt-4 text-[#ef4444] font-bold hidden"></p>
+            </div>
+        </div>
+
+        <div id="success-screen" class="screen max-w-md w-full bg-white rounded-2xl shadow-xl p-10 text-center border border-[#C8CDD2]">
+            <span class="material-icons-round text-6xl text-green-500 mb-4 block">check_circle</span>
+            <h2 class="text-3xl font-bold mb-2 text-[#0A468C]">¡Excelente!</h2>
+            <p class="text-gray-600 font-semibold mb-6">Tus respuestas son correctas. Tu asistencia ha sido registrada exitosamente por hoy.</p>
+            <p class="text-sm text-gray-400">Puedes cerrar esta ventana. Nos vemos mañana.</p>
+        </div>
+
+    </main>
+
+    <script>
+        // ======= CONFIGURACIÓN IMPORTANTE =======
+        // PEGA AQUÍ LA URL DE TU WEB APP DE GOOGLE APPS SCRIPT
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyoY17FStB_msbSj3UWjUtNV0k4AKHngbwXv8D82DRpkDFPZQrDdb0o51aQhYtzZANJpw/exec"; 
+        
+        let currentStudent = {};
+        let dailyQuestions = [];
+
+        // BASE DE DATOS DE PREGUNTAS (Agosto/Septiembre)
+        const questionBank = {
+            "1ro Sec": [
+                { q: "(Hist. Bolivia) ¿Cuál era la función principal del Qhapaq Ñan?", options: ["Sistema de caminos y tambos para control territorial", "Estructura militar defensiva", "Sistema de tributos monetarios"], a: 0 },
+                { q: "(Hist. Bolivia) ¿Qué rol cumplían los Mitimaes en la organización andina?", options: ["Sacerdotes del Sol", "Grupos enviados para colonizar y controlar pisos ecológicos", "Mensajeros veloces del Inca"], a: 1 },
+                { q: "(Hist. Bolivia) La cosmovisión andina se basa fundamentalmente en el principio de:", options: ["Individualismo", "Acumulación de riqueza", "La reciprocidad"], a: 2 },
+                { q: "(Hist. Bolivia) En el arte textil andino, ¿qué nombre reciben los símbolos con lenguaje propio?", options: ["Quipus", "Tocapus", "Chullpas"], a: 1 },
+                { q: "(Hist. Universal) ¿Qué cultura americana dominó la tecnología megalítica y los pisos ecológicos antes que los Incas?", options: ["Aztecas", "Tiwanaku", "Olmecas"], a: 1 },
+                { q: "(Hist. Universal) Durante la Edad Media, ¿qué relación social y política estructuraba el Feudalismo?", options: ["El Vasallaje", "La Esclavitud", "La Ciudadanía universal"], a: 0 },
+                { q: "(Hist. Universal) ¿Qué elemento arquitectónico define el Arte Gótico en las catedrales?", options: ["Arcos de medio punto", "Paredes sin ventanas", "Grandes vitrales e iluminación"], a: 2 },
+                { q: "(Hist. Universal) ¿Qué gran líder unificó Europa Occidental y fue coronado en el año 800?", options: ["Julio César", "Alejandro Magno", "Carlomagno"], a: 2 }
+            ],
+            "2do Sec": [
+                { q: "(Hist. Bolivia) ¿Qué sistema representaba la explotación forzada en el Cerro Rico de Potosí?", options: ["La Mita Minera", "El Ayllu", "El Obraje textil"], a: 0 },
+                { q: "(Hist. Bolivia) ¿Para qué se utilizaba la técnica de la amalgama?", options: ["Refinar oro", "Extraer plata utilizando mercurio", "Fabricar cerámica"], a: 1 },
+                { q: "(Hist. Bolivia) La sociedad durante la colonia española se estructuraba como:", options: ["Una pirámide de castas raciales", "Una sociedad sin clases", "Una democracia participativa"], a: 0 },
+                { q: "(Hist. Bolivia) ¿Qué estilo arquitectónico nació del mestizaje cultural entre lo europeo y lo indígena?", options: ["Neoclasicismo", "Arte Barroco Mestizo", "Romanticismo"], a: 1 },
+                { q: "(Hist. Universal) ¿Qué evento marca el estallido simbólico de la Revolución Francesa en 1789?", options: ["La Batalla de Waterloo", "El Congreso de Viena", "La Toma de la Bastilla"], a: 2 },
+                { q: "(Hist. Universal) ¿Qué sistema de gobierno predominaba en Europa antes de la Revolución Francesa?", options: ["Monarquía Absoluta", "República Federal", "Democracia Directa"], a: 0 },
+                { q: "(Hist. Universal) ¿Qué tecnología impulsó drásticamente la Primera Revolución Industrial?", options: ["La Electricidad", "La Máquina a Vapor", "El Motor de Combustión"], a: 1 },
+                { q: "(Hist. Universal) ¿Qué nueva estructura social surgió producto de la industrialización?", options: ["Señores y siervos", "Nobleza y clero", "Burguesía y proletariado"], a: 2 }
+            ],
+            "3ro Sec": [
+                { q: "(Hist. Bolivia) ¿Qué caudillo militar gobernó durante el 'Sexenio' afectando tierras comunitarias?", options: ["Manuel Isidoro Belzu", "Mariano Melgarejo", "Aniceto Arce"], a: 1 },
+                { q: "(Hist. Bolivia) ¿Quién fue el principal héroe civil en la Defensa de Calama?", options: ["Eduardo Abaroa", "Ladislao Cabrera", "Juancito Pinto"], a: 0 },
+                { q: "(Hist. Bolivia) ¿Mediante qué tratado Bolivia consolidó la pérdida del Litoral a inicios del Siglo XX?", options: ["Tratado de Petrópolis", "Tratado de 1904", "Pacto de Tregua"], a: 1 },
+                { q: "(Hist. Bolivia) Durante la 'Era de la Plata', ¿quiénes dominaron la política del Partido Conservador?", options: ["Arce y Pacheco", "Patiño y Hochschild", "Banzer y Paz Estenssoro"], a: 0 },
+                { q: "(Hist. Universal) ¿Qué ideología totalitaria se impuso en Alemania liderada por Adolf Hitler?", options: ["Comunismo", "Fascismo", "Nazismo"], a: 2 },
+                { q: "(Hist. Universal) ¿Qué evento bélico ocurrido en septiembre de 1939 inició la Segunda Guerra Mundial?", options: ["El bombardeo de Pearl Harbor", "La Invasión a Polonia", "El Día D"], a: 1 },
+                { q: "(Hist. Universal) Durante la Guerra Fría, ¿qué construcción dividió a Alemania en dos frentes ideológicos?", options: ["El Muro de Berlín", "La Cortina de Hierro", "La Línea Maginot"], a: 0 },
+                { q: "(Hist. Universal) ¿El ataque a qué ciudades marcó el final de la guerra en el Pacífico?", options: ["Tokio y Osaka", "Hiroshima y Nagasaki", "Seúl y Pionyang"], a: 1 }
+            ],
+            "4to Sec": [
+                { q: "(Hist. Bolivia) ¿Qué logros estructurales se consiguieron con la Revolución de 1952?", options: ["Voto Universal y Reforma Agraria", "Capitalización de Empresas", "Nueva Constitución Plurinacional"], a: 0 },
+                { q: "(Hist. Bolivia) ¿Qué dictadores marcaron los regímenes de los años 70 y 80 en Bolivia?", options: ["René Barrientos y Alfredo Ovando", "Hugo Banzer y Luis García Meza", "Hernán Siles y Víctor Paz"], a: 1 },
+                { q: "(Hist. Bolivia) ¿Qué nombre recibió la represión política regional coordinada en Sudamérica?", options: ["Operación Cóndor", "Alianza para el Progreso", "Doctrina Monroe"], a: 0 },
+                { q: "(Hist. Bolivia) ¿Qué conflictos sociales caracterizaron la Crisis entre 2000 y 2003?", options: ["Revolución Federal", "Guerra del Acre y del Chaco", "Guerra del Agua y Guerra del Gas"], a: 2 },
+                { q: "(Hist. Universal) Tras la Segunda Guerra Mundial, ¿qué organismo se creó para mantener la paz y proteger los DDHH?", options: ["La Liga de las Naciones", "La Organización de Naciones Unidas", "La OTAN"], a: 1 },
+                { q: "(Hist. Universal) ¿Qué políticas impulsó Gorbachov que aceleraron la caída del bloque soviético?", options: ["Perestroika y Glasnost", "Revolución Cultural", "Planes Quinquenales"], a: 0 },
+                { q: "(Hist. Universal) ¿Qué organización consolidó la integración económica y política en Europa en los años 90?", options: ["El Pacto de Varsovia", "La Unión Europea", "La Comunidad de Estados Independientes"], a: 1 },
+                { q: "(Hist. Universal) ¿Qué líder impulsó la apertura que permitió el gran ascenso económico de China?", options: ["Mao Zedong", "Deng Xiaoping", "Chiang Kai-shek"], a: 1 }
+            ]
+        };
+
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        async function login() {
+            const codigo = document.getElementById('codigo-input').value.trim();
+            const errorMsg = document.getElementById('error-msg');
+            const btn = document.getElementById('btn-login');
+            const loader = document.getElementById('login-loader');
+
+            if (!codigo) {
+                errorMsg.innerText = "Por favor ingresa tu código.";
+                errorMsg.style.display = "block";
+                return;
+            }
+
+            errorMsg.style.display = "none";
+            btn.style.display = "none";
+            loader.style.display = "block";
+
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "login", codigo: codigo }),
+                    headers: { "Content-Type": "text/plain;charset=utf-8" }
+                });
+                
+                const data = await response.json();
+
+                if (data.success) {
+                    currentStudent = { codigo: codigo, nombre: data.estudiante, curso: data.curso };
+                    setupQuiz();
+                    switchScreen('quiz-screen');
+                } else {
+                    errorMsg.innerText = data.message;
+                    errorMsg.style.display = "block";
+                    btn.style.display = "block";
+                }
+            } catch (err) {
+                errorMsg.innerText = "Error de conexión. Intenta nuevamente.";
+                errorMsg.style.display = "block";
+                btn.style.display = "block";
+            } finally {
+                loader.style.display = "none";
+            }
+        }
+
+        function setupQuiz() {
+            document.getElementById('student-name').innerText = currentStudent.nombre;
+            document.getElementById('student-course').innerText = currentStudent.curso;
+            
+            const hoy = new Date();
+            const dia = hoy.getDate();
+            document.getElementById('current-day').innerText = dia;
+
+            let cursoData = currentStudent.curso.includes("1ro") ? "1ro Sec" : 
+                            currentStudent.curso.includes("2do") ? "2do Sec" :
+                            currentStudent.curso.includes("3ro") ? "3ro Sec" : "4to Sec";
+            
+            const bank = questionBank[cursoData] || questionBank["4to Sec"];
+            
+            // Selector predecible basado en el día para que no varíe recargando la página
+            const index1 = (dia * 3) % bank.length;
+            const index2 = (dia * 5 + 1) % bank.length;
+            const index3 = (dia * 7 + 2) % bank.length;
+            
+            dailyQuestions = [ bank[index1], bank[index2], bank[index3] ];
+            renderQuestions();
+        }
+
+        function renderQuestions() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = "";
+
+            dailyQuestions.forEach((qObj, index) => {
+                let html = `
+                <div class="mb-6" data-qindex="${index}">
+                    <h3 class="text-lg font-bold mb-3 text-[#0A468C]">${index + 1}. ${qObj.q}</h3>
+                    <div class="space-y-3">
+                        ${qObj.options.map((opt, optIndex) => `
+                            <div class="quiz-option p-4 rounded-xl font-semibold flex items-center gap-3" onclick="selectOption(this, ${index}, ${optIndex})">
+                                <div class="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center inner-circle"></div>
+                                ${opt}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        function selectOption(el, qIndex, optIndex) {
+            const parent = el.closest(`[data-qindex="${qIndex}"]`);
+            parent.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('selected');
+                opt.querySelector('.inner-circle').innerHTML = "";
+            });
+            el.classList.add('selected');
+            el.querySelector('.inner-circle').innerHTML = `<div class="w-3 h-3 bg-white rounded-full"></div>`;
+            dailyQuestions[qIndex].userAnswer = optIndex;
+        }
+
+        async function submitQuiz() {
+            const errorMsg = document.getElementById('quiz-error');
+            errorMsg.classList.add('hidden');
+
+            for (let i = 0; i < dailyQuestions.length; i++) {
+                if (dailyQuestions[i].userAnswer === undefined) {
+                    errorMsg.innerText = "Por favor responde todas las preguntas antes de continuar.";
+                    errorMsg.classList.remove('hidden');
+                    return;
+                }
+            }
+
+            // Verificar respuestas correctas (Obligatorio 3/3 para registrar)
+            let score = 0;
+            dailyQuestions.forEach(q => { if (q.userAnswer === q.a) score++; });
+
+            if (score < 3) {
+                errorMsg.innerText = `Obtuviste ${score} de 3. Revisa los contenidos y corrige tus errores para poder registrar tu asistencia.`;
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+
+            // Registrar en el backend
+            const btn = document.getElementById('btn-submit');
+            const loader = document.getElementById('quiz-loader');
+            
+            btn.style.display = "none";
+            loader.style.display = "block";
+
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ 
+                        action: "register", 
+                        codigo: currentStudent.codigo,
+                        nombre: currentStudent.nombre,
+                        curso: currentStudent.curso
+                    }),
+                    headers: { "Content-Type": "text/plain;charset=utf-8" }
+                });
+                
+                const data = await response.json();
+
+                if (data.success) {
+                    switchScreen('success-screen');
+                } else {
+                    errorMsg.innerText = data.message;
+                    errorMsg.classList.remove('hidden');
+                    btn.style.display = "block";
+                }
+            } catch (err) {
+                errorMsg.innerText = "Error registrando asistencia. Intenta de nuevo.";
+                errorMsg.classList.remove('hidden');
+                btn.style.display = "block";
+            } finally {
+                loader.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
