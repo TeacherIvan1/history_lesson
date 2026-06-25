@@ -118,218 +118,267 @@
     </main>
 
     <script>
-        // ======= CONFIGURACIÓN IMPORTANTE =======
-        // PEGA AQUÍ LA URL DE TU WEB APP DE GOOGLE APPS SCRIPT
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx7hTT4qbGFxDA1ZsUyvVVOPYU7FU5OhMC4NmtPDfOEHsf1LnMFAgk9ck4ttk0Y5qSf3Q/exec"; 
+    // ======= CONFIGURACIÓN IMPORTANTE =======
+    // PEGA AQUÍ LA URL DE TU WEB APP DE GOOGLE APPS SCRIPT
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx7hTT4qbGFxDA1ZsUyvVVOPYU7FU5OhMC4NmtPDfOEHsf1LnMFAgk9ck4ttk0Y5qSf3Q/exec"; 
+    
+    let currentStudent = {};
+    let dailyQuestions = [];
+
+   // BANCO DE PREGUNTAS - LOTE 1 (Agosto y Septiembre)
+    const questionBank = {
+        "1ro Sec": [
+            // Historia de Bolivia
+            { q: "El Qhapaq Ñan no era solo una ruta de transporte de bienes, sino un sistema de integración. ¿Qué consecuencia geopolítica tuvo esto para el Estado Inca?", options: ["Aisló a las comunidades andinas para evitar rebeliones.", "Permitió una administración rápida del territorio y el movimiento veloz de tropas.", "Fomentó la independencia económica de los señoríos conquistados."], a: 1 },
+            { q: "¿Por qué la estrategia de los Mitimaes (traslado de poblaciones) fue fundamental para el control vertical en la geografía andina?", options: ["Permitía explotar distintos pisos ecológicos y asegurar variedad de alimentos.", "Se utilizaba exclusivamente para castigar a los prisioneros de guerra.", "Su único objetivo era construir enormes templos en la Amazonía."], a: 0 },
+            { q: "En la cosmovisión andina, la reciprocidad es un pilar fundamental. En la práctica agrícola, esto se evidenciaba cuando:", options: ["El Inca acumulaba todo el grano sin devolver nada al pueblo.", "Se aplicaba el Ayni, donde las familias se ayudaban mutuamente en la siembra y cosecha.", "Se contrataban campesinos asalariados para trabajar las tierras privadas del curaca."], a: 1 },
+            { q: "En el arte textil andino, los Tocapus no eran simples adornos estéticos. ¿Qué función social e ideológica cumplían?", options: ["Servían como símbolos de estatus social, linaje y poseían un lenguaje propio.", "Eran la moneda oficial de cambio antes de la llegada de los españoles.", "Se utilizaban únicamente como mapas para encontrar fuentes de agua."], a: 0 },
+            { q: "Las Lomas artificiales construidas por la cultura Moxos en las tierras bajas de Bolivia demuestran una gran adaptación al medio. ¿Por qué se construían?", options: ["Para acercarse al sol durante los rituales religiosos de solsticio.", "Como defensa militar exclusiva contra los ataques del Imperio Inca.", "Para evitar las inundaciones cíclicas y mantener los cultivos a salvo."], a: 2 },
+            // Historia Universal
+            { q: "Durante el Feudalismo en la Edad Media, el siervo entregaba su cosecha al señor feudal a cambio de protección. ¿Qué nos dice esto sobre el Estado en esa época?", options: ["Que el poder central estaba fragmentado y privatizado en manos de nobles locales.", "Que el Rey mantenía un control absoluto y democrático sobre todos los ciudadanos.", "Que no existía ninguna jerarquía social en los reinos europeos."], a: 0 },
+            { q: "La vida dentro del Castillo Medieval estaba estrictamente estratificada. ¿Cómo justificaba la sociedad estamental la inmovilidad de las clases sociales?", options: ["A través del libre mercado y el esfuerzo individual de cada campesino.", "Bajo la creencia de que el orden social era un diseño divino e incuestionable.", "Mediante leyes votadas democráticamente en asambleas populares."], a: 1 },
+            { q: "Las catedrales del Arte Gótico se caracterizan por sus enormes vitrales. A nivel simbólico y psicológico, ¿qué buscaban transmitir a los fieles?", options: ["El miedo a la oscuridad y la amenaza constante del infierno.", "La austeridad, la pobreza extrema y el rechazo a la belleza.", "La elevación espiritual y la presencia de Dios a través de la luz."], a: 2 },
+            { q: "El desarrollo de la cultura Tiwanaku dependió de su dominio sobre distintos pisos ecológicos. ¿Qué ventaja le dio esto frente a aldeas más primitivas?", options: ["Les permitió aislarse en el altiplano sin depender de otras regiones.", "Lograron una dieta variada y excedentes agrícolas que sostuvieron un Estado complejo.", "Abandonaron la agricultura por completo para dedicarse solo a la guerra expansiva."], a: 1 },
+            { q: "A diferencia del Imperio Romano de Occidente, durante la Edad Media la Iglesia Católica adquirió un poder superior al de muchos reyes porque:", options: ["Poseía los ejércitos más grandes de toda Europa y Asia.", "Era la única institución unificadora que monopolizaba el conocimiento y la moral.", "Renunció a todas sus tierras para dedicarse exclusivamente a la oración."], a: 1 }
+        ],
+        "2do Sec": [
+            // Historia de Bolivia
+            { q: "La Mita minera colonial en el Cerro Rico de Potosí adaptó un sistema incaico, pero cambió su propósito central. ¿Cuál fue la diferencia crítica?", options: ["Se basaba en la reciprocidad y redistribución de la riqueza comunal.", "Buscaba la acumulación masiva de metales exclusivamente para la metrópoli española.", "Era un sistema de trabajo voluntario y bien remunerado para los indígenas."], a: 1 },
+            { q: "El uso del mercurio (azogue) en la tecnología de la amalgama revolucionó Potosí porque:", options: ["Permitió extraer plata de minerales de baja ley, multiplicando la producción pero intoxicando a los mitayos.", "Reemplazó por completo la necesidad de mano de obra humana en el Cerro Rico.", "Se usaba como moneda de cambio directa entre las colonias americanas."], a: 0 },
+            { q: "El sistema de Encomienda otorgaba a un español el cobro de tributos indígenas a cambio de evangelizarlos. En la realidad, esto encubrió:", options: ["La fundación de las primeras universidades indígenas en los Andes.", "Una relación de igualdad comercial entre el encomendero y los caciques locales.", "Un sistema de servidumbre y explotación forzada de la fuerza laboral nativa."], a: 2 },
+            { q: "El sistema de castas colonial dividía a la población según su origen racial. ¿Qué objetivo político a largo plazo sostenía esta estructura?", options: ["Preparar a las colonias para una transición pacífica hacia la independencia.", "Fomentar la mezcla cultural sin restricciones económicas ni sociales.", "Garantizar los privilegios y el monopolio del poder en manos de la minoría blanca."], a: 2 },
+            { q: "El Arte Barroco Mestizo combinó estilos europeos con motivos indígenas (flora, fauna, deidades solares). ¿Qué fenómeno social refleja este estilo?", options: ["La aceptación total de los indígenas hacia la religión sin modificaciones.", "El sincretismo cultural y la resistencia identitaria camuflada en la arquitectura.", "La pérdida absoluta de las tradiciones originarias frente a la conquista."], a: 1 },
+            // Historia Universal
+            { q: "La Toma de la Bastilla fue un acto simbólico contra el absolutismo. ¿Por qué la burguesía lideró la Revolución Francesa si ya poseía poder económico?", options: ["Buscaban equidad política, leyes justas y eliminar los privilegios de la nobleza.", "Querían instaurar una nueva monarquía bajo el mando del clero católico.", "Deseaban destruir las propiedades privadas y las fábricas en Francia."], a: 0 },
+            { q: "Las campañas militares del Imperio Napoleónico en Europa tuvieron un efecto contradictorio a largo plazo. ¿Cuál fue?", options: ["Restauraron el feudalismo en todos los territorios conquistados.", "Expandieron las ideas liberales de la revolución, pero despertaron fuertes nacionalismos en su contra.", "Lograron una paz permanente en Europa por más de dos siglos sin conflictos."], a: 1 },
+            { q: "La máquina a vapor transformó la Primera Revolución Industrial. ¿Cuál fue su impacto demográfico y geográfico más drástico?", options: ["La población abandonó las ciudades para retornar al trabajo rural.", "El éxodo rural masivo hacia las ciudades, creando urbes contaminadas y superpobladas.", "La distribución equitativa de la población en todo el territorio europeo."], a: 1 },
+            { q: "Con el surgimiento de la Sociedad de Clases durante la industrialización, el movimiento obrero empezó a organizarse porque:", options: ["Los empresarios ofrecían demasiadas vacaciones y los obreros querían trabajar más.", "Buscaban restaurar los privilegios de los antiguos gremios medievales.", "Carecían de derechos laborales, sufrían jornadas extenuantes y salarios miserables."], a: 2 },
+            { q: "La Declaración de los Derechos del Hombre y del Ciudadano (1789) rompió con el Antiguo Régimen al establecer que:", options: ["La soberanía reside en la Nación y no en el derecho divino de un monarca.", "Solo los hombres con títulos nobiliarios tienen derecho a ser ciudadanos.", "El Estado debe confiscar todas las riquezas personales para distribuirlas."], a: 0 }
+        ],
+        "3ro Sec": [
+            // Historia de Bolivia
+            { q: "Más allá del impuesto de los 10 centavos, ¿cuál fue la verdadera causa geopolítica de fondo que desató la Guerra del Pacífico?", options: ["Las disputas religiosas entre Bolivia, Perú y Chile por el control de misiones.", "El interés imperialista británico y chileno por el control de los yacimientos de guano y salitre.", "El intento de Bolivia por anexar territorios del norte chileno hacia el sur."], a: 1 },
+            { q: "La defensa de Calama y la figura de Eduardo Abaroa se mantienen en la memoria boliviana porque representan:", options: ["La superioridad armamentística que tenía Bolivia al inicio del conflicto.", "La firma inmediata de un tratado de rendición para evitar bajas.", "La resistencia civil organizada ante la invasión y el abandono estatal de la época."], a: 2 },
+            { q: "El Tratado de 1904 otorgó a Bolivia compensaciones económicas y libre tránsito. Analizando a largo plazo, ¿cuál fue el costo estructural para el país?", options: ["El enclaustramiento marítimo que limitó severamente su desarrollo comercial e inserción internacional.", "El inicio de una alianza militar perpetua con Chile frente a otros países.", "El desarrollo inmediato de Bolivia como la primera potencia industrial de Sudamérica."], a: 0 },
+            { q: "Durante la 'Era de la Plata', magnates como Aniceto Arce asumieron directamente la presidencia de Bolivia. ¿Qué nos indica esto sobre el Estado de fines del Siglo XIX?", options: ["Que el poder político estaba completamente separado de los intereses económicos empresariales.", "Que el Estado beneficiaba y estaba fusionado con la élite conservadora y minera del país.", "Que los movimientos obreros e indígenas tenían gran representación en el parlamento."], a: 1 },
+            { q: "La construcción de ferrocarriles durante los gobiernos conservadores y liberales en Bolivia tuvo un diseño geográfico específico. ¿Para qué fueron trazados?", options: ["Para conectar las capitales departamentales y fomentar el turismo interno.", "Para facilitar la exportación rápida de minerales hacia los puertos del Pacífico.", "Para defender las fronteras militares con Brasil y Argentina."], a: 1 },
+            // Historia Universal
+            { q: "El Holocausto (la 'Solución Final') perpetrado por el régimen nazi se diferencia de otras masacres históricas principalmente por:", options: ["Ocurrir exclusivamente durante batallas en campo abierto entre ejércitos regulares.", "Utilizar la burocracia del Estado, la ciencia y la industria moderna para un exterminio sistemático.", "Ser una explosión espontánea y desorganizada de violencia ciudadana."], a: 1 },
+            { q: "El fin de la Segunda Guerra Mundial en el Pacífico se marcó por el lanzamiento de las bombas atómicas. Geopolíticamente, Estados Unidos buscaba con esto:", options: ["Forzar la rendición japonesa y enviar una demostración de poder absoluto frente a la Unión Soviética.", "Ayudar a Japón a reconstruir su economía destruida por la guerra.", "Repartir el territorio japonés en igualdad de condiciones con las potencias europeas."], a: 0 },
+            { q: "La Guerra Fría enfrentó a dos superpotencias (EE.UU. y la URSS) que nunca combatieron directamente. ¿Cómo se libró principalmente este conflicto?", options: ["A través de la intervención en guerras periféricas (Corea, Vietnam), espionaje y carrera espacial.", "Mediante debates diplomáticos pacíficos en las asambleas de la recién creada ONU.", "A través de guerras comerciales donde solo intercambiaban alimentos y bienes de consumo."], a: 0 },
+            { q: "La construcción del Muro de Berlín en 1961 no fue para evitar invasiones militares a la RDA. ¿Cuál fue su propósito real?", options: ["Detener la masiva fuga de ciudadanos de la Alemania comunista hacia el sector capitalista occidental.", "Proteger los avances tecnológicos de Berlín Oriental frente al espionaje estadounidense.", "Servir como un monumento conmemorativo a las víctimas de la Segunda Guerra Mundial."], a: 0 },
+            { q: "El proceso de descolonización de África y Asia tras 1945 fue acelerado por una razón clave en el contexto internacional:", options: ["El deseo voluntario de las potencias europeas de regalar sus territorios ultramarinos.", "El debilitamiento económico de Europa tras la guerra y la presión por la autodeterminación local.", "La intervención de Naciones Unidas que obligó el uso de fuerza militar contra Inglaterra."], a: 1 }
+        ],
+        "4to Sec": [
+            // Historia de Bolivia
+            { q: "Las dictaduras militares de los años 70 en Bolivia (Banzer, García Meza) justificaron sus golpes de Estado argumentando:", options: ["La necesidad de convocar a elecciones inmediatas y transparentes.", "La defensa del país contra la amenaza del comunismo, amparados en la Doctrina de Seguridad Nacional.", "La urgencia de otorgar derechos sindicales a los obreros y nacionalizar más empresas."], a: 1 },
+            { q: "La Operación Cóndor fue una red de coordinación represiva en el Cono Sur. ¿Qué demuestra esto sobre la política regional de esa época?", options: ["Que las dictaduras sudamericanas cruzaban fronteras para eliminar a la disidencia política con apoyo de EE.UU.", "Que los países latinoamericanos buscaban integrarse comercialmente para competir con Europa.", "Que existía un plan pacífico para intercambiar prisioneros políticos entre distintas naciones."], a: 0 },
+            { q: "El Decreto Supremo 21060 (1985) logró frenar la hiperinflación en Bolivia. Sin embargo, su costo social principal fue:", options: ["El despido masivo de trabajadores estatales (relocalización) y el desmantelamiento de la minería nacionalizada.", "La prohibición absoluta de importar productos extranjeros al mercado boliviano.", "El aumento desproporcionado de los salarios para los maestros y médicos públicos."], a: 0 },
+            { q: "El modelo de Capitalización en los años 90 transfirió empresas estatales a empresas privadas extranjeras. ¿Qué promesa económica sustentaba esta política?", options: ["Que las ganancias se quedarían al 100% en los municipios bolivianos más pobres.", "Que la inversión privada modernizaría las empresas, generaría empleo e insertaría al país en el mercado global.", "Que las empresas serían administradas exclusivamente por sindicatos de trabajadores campesinos."], a: 1 },
+            { q: "La Guerra del Agua (2000) y la Guerra del Gas (2003) compartieron una motivación estructural profunda en la sociedad boliviana. ¿Cuál fue?", options: ["El deseo de anexar territorialmente zonas fronterizas con Chile y Brasil.", "El agotamiento del modelo neoliberal y la demanda de recuperar la soberanía sobre los recursos naturales.", "La petición de las élites empresariales para pagar menos impuestos al Estado."], a: 1 },
+            // Historia Universal
+            { q: "Las políticas de 'Perestroika' y 'Glasnost' impulsadas por Mijaíl Gorbachov intentaron salvar a la Unión Soviética, pero causaron:", options: ["La aceleración del colapso del bloque soviético al transparentar la crisis y permitir libertades reprimidas.", "El fortalecimiento del comunismo ortodoxo y la invasión de más países europeos.", "La victoria económica sobre Estados Unidos al finalizar la década de 1980."], a: 0 },
+            { q: "Tras la caída del Muro de Berlín, surgió el llamado 'Nuevo Orden Mundial'. ¿Qué característica geopolítica definió la década de los 90?", options: ["El retorno de las monarquías absolutistas en Europa Central.", "Un sistema bipolar donde China y Rusia se repartieron el control de occidente.", "La unipolaridad estadounidense como hiperpotencia militar y la expansión del capitalismo global."], a: 2 },
+            { q: "La creación de la Unión Europea (UE) mediante el Tratado de Maastricht buscó superar los traumas bélicos del siglo XX mediante:", options: ["La creación de un enorme ejército conjunto para invadir Medio Oriente.", "La integración económica (mercado y moneda única) para asegurar la interdependencia y la paz regional.", "La construcción de barreras arancelarias estrictas entre los países miembros."], a: 1 },
+            { q: "Las reformas de Deng Xiaoping transformaron a China bajo la premisa de 'un país, dos sistemas'. ¿Cómo se tradujo esto en la práctica?", options: ["El Partido Comunista mantuvo el control político estricto, pero abrió la economía al libre mercado capitalista.", "China se dividió geográficamente en dos naciones independientes sin relación entre sí.", "Se instauró una democracia multipartidista pero la economía siguió siendo 100% planificada por el Estado."], a: 0 },
+            { q: "La Revolución Digital y el Internet han cambiado la naturaleza de los conflictos globales en el siglo XXI. Hoy en día, una guerra asimétrica implica que:", options: ["Solo los países con mayor número de tanques y soldados pueden ganar batallas.", "Actores no estatales (hackers, terroristas) pueden causar daños críticos a la infraestructura de grandes potencias.", "Las disputas internacionales se resuelven exclusivamente mediante tribunales internacionales."], a: 1 }
+        ]
+    };
+    };
+
+    function switchScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
+
+    async function login() {
+        const codigo = document.getElementById('codigo-input').value.trim();
+        const errorMsg = document.getElementById('error-msg');
+        const btn = document.getElementById('btn-login');
+        const loader = document.getElementById('login-loader');
+
+        // Validar Fechas (El juego solo funciona del 6 al 31 de Julio)
+        const hoy = new Date();
+        const mesActual = hoy.getMonth() + 1; // Enero es 0, Julio es 7
+        const diaActual = hoy.getDate();
         
-        let currentStudent = {};
-        let dailyQuestions = [];
-
-        // BASE DE DATOS DE PREGUNTAS (Agosto/Septiembre)
-        const questionBank = {
-            "1ro Sec": [
-                { q: "(Hist. Bolivia) ¿Cuál era la función principal del Qhapaq Ñan?", options: ["Sistema de caminos y tambos para control territorial", "Estructura militar defensiva", "Sistema de tributos monetarios"], a: 0 },
-                { q: "(Hist. Bolivia) ¿Qué rol cumplían los Mitimaes en la organización andina?", options: ["Sacerdotes del Sol", "Grupos enviados para colonizar y controlar pisos ecológicos", "Mensajeros veloces del Inca"], a: 1 },
-                { q: "(Hist. Bolivia) La cosmovisión andina se basa fundamentalmente en el principio de:", options: ["Individualismo", "Acumulación de riqueza", "La reciprocidad"], a: 2 },
-                { q: "(Hist. Bolivia) En el arte textil andino, ¿qué nombre reciben los símbolos con lenguaje propio?", options: ["Quipus", "Tocapus", "Chullpas"], a: 1 },
-                { q: "(Hist. Universal) ¿Qué cultura americana dominó la tecnología megalítica y los pisos ecológicos antes que los Incas?", options: ["Aztecas", "Tiwanaku", "Olmecas"], a: 1 },
-                { q: "(Hist. Universal) Durante la Edad Media, ¿qué relación social y política estructuraba el Feudalismo?", options: ["El Vasallaje", "La Esclavitud", "La Ciudadanía universal"], a: 0 },
-                { q: "(Hist. Universal) ¿Qué elemento arquitectónico define el Arte Gótico en las catedrales?", options: ["Arcos de medio punto", "Paredes sin ventanas", "Grandes vitrales e iluminación"], a: 2 },
-                { q: "(Hist. Universal) ¿Qué gran líder unificó Europa Occidental y fue coronado en el año 800?", options: ["Julio César", "Alejandro Magno", "Carlomagno"], a: 2 }
-            ],
-            "2do Sec": [
-                { q: "(Hist. Bolivia) ¿Qué sistema representaba la explotación forzada en el Cerro Rico de Potosí?", options: ["La Mita Minera", "El Ayllu", "El Obraje textil"], a: 0 },
-                { q: "(Hist. Bolivia) ¿Para qué se utilizaba la técnica de la amalgama?", options: ["Refinar oro", "Extraer plata utilizando mercurio", "Fabricar cerámica"], a: 1 },
-                { q: "(Hist. Bolivia) La sociedad durante la colonia española se estructuraba como:", options: ["Una pirámide de castas raciales", "Una sociedad sin clases", "Una democracia participativa"], a: 0 },
-                { q: "(Hist. Bolivia) ¿Qué estilo arquitectónico nació del mestizaje cultural entre lo europeo y lo indígena?", options: ["Neoclasicismo", "Arte Barroco Mestizo", "Romanticismo"], a: 1 },
-                { q: "(Hist. Universal) ¿Qué evento marca el estallido simbólico de la Revolución Francesa en 1789?", options: ["La Batalla de Waterloo", "El Congreso de Viena", "La Toma de la Bastilla"], a: 2 },
-                { q: "(Hist. Universal) ¿Qué sistema de gobierno predominaba en Europa antes de la Revolución Francesa?", options: ["Monarquía Absoluta", "República Federal", "Democracia Directa"], a: 0 },
-                { q: "(Hist. Universal) ¿Qué tecnología impulsó drásticamente la Primera Revolución Industrial?", options: ["La Electricidad", "La Máquina a Vapor", "El Motor de Combustión"], a: 1 },
-                { q: "(Hist. Universal) ¿Qué nueva estructura social surgió producto de la industrialización?", options: ["Señores y siervos", "Nobleza y clero", "Burguesía y proletariado"], a: 2 }
-            ],
-            "3ro Sec": [
-                { q: "(Hist. Bolivia) ¿Qué caudillo militar gobernó durante el 'Sexenio' afectando tierras comunitarias?", options: ["Manuel Isidoro Belzu", "Mariano Melgarejo", "Aniceto Arce"], a: 1 },
-                { q: "(Hist. Bolivia) ¿Quién fue el principal héroe civil en la Defensa de Calama?", options: ["Eduardo Abaroa", "Ladislao Cabrera", "Juancito Pinto"], a: 0 },
-                { q: "(Hist. Bolivia) ¿Mediante qué tratado Bolivia consolidó la pérdida del Litoral a inicios del Siglo XX?", options: ["Tratado de Petrópolis", "Tratado de 1904", "Pacto de Tregua"], a: 1 },
-                { q: "(Hist. Bolivia) Durante la 'Era de la Plata', ¿quiénes dominaron la política del Partido Conservador?", options: ["Arce y Pacheco", "Patiño y Hochschild", "Banzer y Paz Estenssoro"], a: 0 },
-                { q: "(Hist. Universal) ¿Qué ideología totalitaria se impuso en Alemania liderada por Adolf Hitler?", options: ["Comunismo", "Fascismo", "Nazismo"], a: 2 },
-                { q: "(Hist. Universal) ¿Qué evento bélico ocurrido en septiembre de 1939 inició la Segunda Guerra Mundial?", options: ["El bombardeo de Pearl Harbor", "La Invasión a Polonia", "El Día D"], a: 1 },
-                { q: "(Hist. Universal) Durante la Guerra Fría, ¿qué construcción dividió a Alemania en dos frentes ideológicos?", options: ["El Muro de Berlín", "La Cortina de Hierro", "La Línea Maginot"], a: 0 },
-                { q: "(Hist. Universal) ¿El ataque a qué ciudades marcó el final de la guerra en el Pacífico?", options: ["Tokio y Osaka", "Hiroshima y Nagasaki", "Seúl y Pionyang"], a: 1 }
-            ],
-            "4to Sec": [
-                { q: "(Hist. Bolivia) ¿Qué logros estructurales se consiguieron con la Revolución de 1952?", options: ["Voto Universal y Reforma Agraria", "Capitalización de Empresas", "Nueva Constitución Plurinacional"], a: 0 },
-                { q: "(Hist. Bolivia) ¿Qué dictadores marcaron los regímenes de los años 70 y 80 en Bolivia?", options: ["René Barrientos y Alfredo Ovando", "Hugo Banzer y Luis García Meza", "Hernán Siles y Víctor Paz"], a: 1 },
-                { q: "(Hist. Bolivia) ¿Qué nombre recibió la represión política regional coordinada en Sudamérica?", options: ["Operación Cóndor", "Alianza para el Progreso", "Doctrina Monroe"], a: 0 },
-                { q: "(Hist. Bolivia) ¿Qué conflictos sociales caracterizaron la Crisis entre 2000 y 2003?", options: ["Revolución Federal", "Guerra del Acre y del Chaco", "Guerra del Agua y Guerra del Gas"], a: 2 },
-                { q: "(Hist. Universal) Tras la Segunda Guerra Mundial, ¿qué organismo se creó para mantener la paz y proteger los DDHH?", options: ["La Liga de las Naciones", "La Organización de Naciones Unidas", "La OTAN"], a: 1 },
-                { q: "(Hist. Universal) ¿Qué políticas impulsó Gorbachov que aceleraron la caída del bloque soviético?", options: ["Perestroika y Glasnost", "Revolución Cultural", "Planes Quinquenales"], a: 0 },
-                { q: "(Hist. Universal) ¿Qué organización consolidó la integración económica y política en Europa en los años 90?", options: ["El Pacto de Varsovia", "La Unión Europea", "La Comunidad de Estados Independientes"], a: 1 },
-                { q: "(Hist. Universal) ¿Qué líder impulsó la apertura que permitió el gran ascenso económico de China?", options: ["Mao Zedong", "Deng Xiaoping", "Chiang Kai-shek"], a: 1 }
-            ]
-        };
-
-        function switchScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
+        if (mesActual !== 7 || diaActual < 6 || diaActual > 31) {
+            errorMsg.innerText = "Las Vacaciones de Invierno y este juego están habilitados únicamente del 6 al 31 de Julio.";
+            errorMsg.style.display = "block";
+            return;
         }
 
-        async function login() {
-            const codigo = document.getElementById('codigo-input').value.trim();
-            const errorMsg = document.getElementById('error-msg');
-            const btn = document.getElementById('btn-login');
-            const loader = document.getElementById('login-loader');
+        if (!codigo) {
+            errorMsg.innerText = "Por favor ingresa tu código.";
+            errorMsg.style.display = "block";
+            return;
+        }
 
-            if (!codigo) {
-                errorMsg.innerText = "Por favor ingresa tu código.";
-                errorMsg.style.display = "block";
-                return;
-            }
+        errorMsg.style.display = "none";
+        btn.style.display = "none";
+        loader.style.display = "block";
 
-            errorMsg.style.display = "none";
-            btn.style.display = "none";
-            loader.style.display = "block";
+        try {
+            const response = await fetch(APPS_SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({ action: "login", codigo: codigo }),
+                headers: { "Content-Type": "text/plain;charset=utf-8" }
+            });
+            
+            const data = await response.json();
 
-            try {
-                const response = await fetch(APPS_SCRIPT_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ action: "login", codigo: codigo }),
-                    headers: { "Content-Type": "text/plain;charset=utf-8" }
-                });
-                
-                const data = await response.json();
-
-                if (data.success) {
-                    currentStudent = { codigo: codigo, nombre: data.estudiante, curso: data.curso };
-                    setupQuiz();
-                    switchScreen('quiz-screen');
-                } else {
-                    errorMsg.innerText = data.message;
-                    errorMsg.style.display = "block";
-                    btn.style.display = "block";
-                }
-            } catch (err) {
-                errorMsg.innerText = "Error de conexión. Intenta nuevamente.";
+            if (data.success) {
+                currentStudent = { codigo: codigo, nombre: data.estudiante, curso: data.curso };
+                setupQuiz();
+                switchScreen('quiz-screen');
+            } else {
+                errorMsg.innerText = data.message;
                 errorMsg.style.display = "block";
                 btn.style.display = "block";
-            } finally {
-                loader.style.display = "none";
             }
+        } catch (err) {
+            errorMsg.innerText = "Error de conexión. Intenta nuevamente.";
+            errorMsg.style.display = "block";
+            btn.style.display = "block";
+        } finally {
+            loader.style.display = "none";
+        }
+    }
+
+    // Generador de números pseudoaleatorios con semilla
+    function seededRandom(seed) {
+        var x = Math.sin(seed++) * 10000;
+        return x - Math.floor(x);
+    }
+
+    function setupQuiz() {
+        document.getElementById('student-name').innerText = currentStudent.nombre;
+        document.getElementById('student-course').innerText = currentStudent.curso;
+        
+        const hoy = new Date();
+        const dia = hoy.getDate();
+        document.getElementById('current-day').innerText = dia;
+
+        let cursoData = currentStudent.curso.includes("1ro") ? "1ro Sec" : 
+                        currentStudent.curso.includes("2do") ? "2do Sec" :
+                        currentStudent.curso.includes("3ro") ? "3ro Sec" : "1ro Sec"; 
+        
+        let bank = questionBank[cursoData];
+        if (!bank || bank.length < 3) bank = questionBank["1ro Sec"]; // Fallback si no hay preguntas suficientes
+
+        // LÓGICA DE AZAR CON SEMILLA (Impide que los alumnos actualicen para cambiar la pregunta)
+        let seed = dia; // Base de la semilla: el día del mes
+        for (let i = 0; i < currentStudent.codigo.length; i++) {
+            seed += currentStudent.codigo.charCodeAt(i); // Suma los caracteres del código del alumno
         }
 
-        function setupQuiz() {
-            document.getElementById('student-name').innerText = currentStudent.nombre;
-            document.getElementById('student-course').innerText = currentStudent.curso;
+        // Clonar y mezclar el banco de preguntas usando la semilla
+        let shuffledBank = [...bank].sort(() => 0.5 - seededRandom(seed));
+        
+        // Seleccionar exactamente 3 preguntas
+        dailyQuestions = shuffledBank.slice(0, 3);
+        
+        // Opcional: Mezclar las opciones dentro de cada pregunta (también con semilla)
+        dailyQuestions.forEach(q => {
+            let optionsWithIndex = q.options.map((opt, index) => ({ opt, originalIndex: index }));
+            optionsWithIndex.sort(() => 0.5 - seededRandom(seed + 1));
             
-            const hoy = new Date();
-            const dia = hoy.getDate();
-            document.getElementById('current-day').innerText = dia;
+            q.shuffledOptions = optionsWithIndex.map(o => o.opt);
+            q.correctShuffledIndex = optionsWithIndex.findIndex(o => o.originalIndex === q.a);
+        });
 
-            let cursoData = currentStudent.curso.includes("1ro") ? "1ro Sec" : 
-                            currentStudent.curso.includes("2do") ? "2do Sec" :
-                            currentStudent.curso.includes("3ro") ? "3ro Sec" : "4to Sec";
-            
-            const bank = questionBank[cursoData] || questionBank["4to Sec"];
-            
-            // Selector predecible basado en el día para que no varíe recargando la página
-            const index1 = (dia * 3) % bank.length;
-            const index2 = (dia * 5 + 1) % bank.length;
-            const index3 = (dia * 7 + 2) % bank.length;
-            
-            dailyQuestions = [ bank[index1], bank[index2], bank[index3] ];
-            renderQuestions();
-        }
+        renderQuestions();
+    }
 
-        function renderQuestions() {
-            const container = document.getElementById('quiz-container');
-            container.innerHTML = "";
+    function renderQuestions() {
+        const container = document.getElementById('quiz-container');
+        container.innerHTML = "";
 
-            dailyQuestions.forEach((qObj, index) => {
-                let html = `
-                <div class="mb-6" data-qindex="${index}">
-                    <h3 class="text-lg font-bold mb-3 text-[#0A468C]">${index + 1}. ${qObj.q}</h3>
-                    <div class="space-y-3">
-                        ${qObj.options.map((opt, optIndex) => `
-                            <div class="quiz-option p-4 rounded-xl font-semibold flex items-center gap-3" onclick="selectOption(this, ${index}, ${optIndex})">
-                                <div class="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center inner-circle"></div>
-                                ${opt}
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>`;
-                container.innerHTML += html;
-            });
-        }
+        dailyQuestions.forEach((qObj, index) => {
+            let html = `
+            <div class="mb-6" data-qindex="${index}">
+                <h3 class="text-lg font-bold mb-3 text-[#0A468C]">${index + 1}. ${qObj.q}</h3>
+                <div class="space-y-3">
+                    ${qObj.shuffledOptions.map((opt, optIndex) => `
+                        <div class="quiz-option p-4 rounded-xl text-sm md:text-base font-semibold flex items-center gap-3" onclick="selectOption(this, ${index}, ${optIndex})">
+                            <div class="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center inner-circle flex-shrink-0"></div>
+                            <span>${opt}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>`;
+            container.innerHTML += html;
+        });
+    }
 
-        function selectOption(el, qIndex, optIndex) {
-            const parent = el.closest(`[data-qindex="${qIndex}"]`);
-            parent.querySelectorAll('.quiz-option').forEach(opt => {
-                opt.classList.remove('selected');
-                opt.querySelector('.inner-circle').innerHTML = "";
-            });
-            el.classList.add('selected');
-            el.querySelector('.inner-circle').innerHTML = `<div class="w-3 h-3 bg-white rounded-full"></div>`;
-            dailyQuestions[qIndex].userAnswer = optIndex;
-        }
+    function selectOption(el, qIndex, optIndex) {
+        const parent = el.closest(`[data-qindex="${qIndex}"]`);
+        parent.querySelectorAll('.quiz-option').forEach(opt => {
+            opt.classList.remove('selected');
+            opt.querySelector('.inner-circle').innerHTML = "";
+        });
+        el.classList.add('selected');
+        el.querySelector('.inner-circle').innerHTML = `<div class="w-3 h-3 bg-white rounded-full"></div>`;
+        dailyQuestions[qIndex].userAnswer = optIndex;
+    }
 
-        async function submitQuiz() {
-            const errorMsg = document.getElementById('quiz-error');
-            errorMsg.classList.add('hidden');
+    async function submitQuiz() {
+        const errorMsg = document.getElementById('quiz-error');
+        errorMsg.classList.add('hidden');
 
-            for (let i = 0; i < dailyQuestions.length; i++) {
-                if (dailyQuestions[i].userAnswer === undefined) {
-                    errorMsg.innerText = "Por favor responde todas las preguntas antes de continuar.";
-                    errorMsg.classList.remove('hidden');
-                    return;
-                }
-            }
-
-            // Verificar respuestas correctas (Obligatorio 3/3 para registrar)
-            let score = 0;
-            dailyQuestions.forEach(q => { if (q.userAnswer === q.a) score++; });
-
-            if (score < 3) {
-                errorMsg.innerText = `Obtuviste ${score} de 3. Revisa los contenidos y corrige tus errores para poder registrar tu asistencia.`;
+        for (let i = 0; i < dailyQuestions.length; i++) {
+            if (dailyQuestions[i].userAnswer === undefined) {
+                errorMsg.innerText = "Por favor, analiza y responde todas las preguntas antes de continuar.";
                 errorMsg.classList.remove('hidden');
                 return;
             }
+        }
 
-            // Registrar en el backend
-            const btn = document.getElementById('btn-submit');
-            const loader = document.getElementById('quiz-loader');
+        // Verificar respuestas
+        let score = 0;
+        dailyQuestions.forEach(q => { if (q.userAnswer === q.correctShuffledIndex) score++; });
+
+        if (score < 3) {
+            errorMsg.innerText = `Has acertado ${score} de 3. Relee detenidamente tus respuestas e inténtalo de nuevo para lograr el registro.`;
+            errorMsg.classList.remove('hidden');
+            return;
+        }
+
+        const btn = document.getElementById('btn-submit');
+        const loader = document.getElementById('quiz-loader');
+        
+        btn.style.display = "none";
+        loader.style.display = "block";
+
+        try {
+            const response = await fetch(APPS_SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({ 
+                    action: "register", 
+                    codigo: currentStudent.codigo,
+                    nombre: currentStudent.nombre,
+                    curso: currentStudent.curso
+                }),
+                headers: { "Content-Type": "text/plain;charset=utf-8" }
+            });
             
-            btn.style.display = "none";
-            loader.style.display = "block";
+            const data = await response.json();
 
-            try {
-                const response = await fetch(APPS_SCRIPT_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ 
-                        action: "register", 
-                        codigo: currentStudent.codigo,
-                        nombre: currentStudent.nombre,
-                        curso: currentStudent.curso
-                    }),
-                    headers: { "Content-Type": "text/plain;charset=utf-8" }
-                });
-                
-                const data = await response.json();
-
-                if (data.success) {
-                    switchScreen('success-screen');
-                } else {
-                    errorMsg.innerText = data.message;
-                    errorMsg.classList.remove('hidden');
-                    btn.style.display = "block";
-                }
-            } catch (err) {
-                errorMsg.innerText = "Error registrando asistencia. Intenta de nuevo.";
+            if (data.success) {
+                switchScreen('success-screen');
+            } else {
+                errorMsg.innerText = data.message;
                 errorMsg.classList.remove('hidden');
                 btn.style.display = "block";
-            } finally {
-                loader.style.display = "none";
             }
+        } catch (err) {
+            errorMsg.innerText = "Error registrando asistencia. Revisa tu conexión de internet.";
+            errorMsg.classList.remove('hidden');
+            btn.style.display = "block";
+        } finally {
+            loader.style.display = "none";
         }
-    </script>
+    }
+</script>
 </body>
 </html>
