@@ -161,13 +161,15 @@
     </main>
 
     <script>
+   <script>
     // ======= CONFIGURACIÓN IMPORTANTE =======
-    // PEGA AQUÍ LA URL DE TU WEB APP DE GOOGLE APPS SCRIPT
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx7hTT4qbGFxDA1ZsUyvVVOPYU7FU5OhMC4NmtPDfOEHsf1LnMFAgk9ck4ttk0Y5qSf3Q/exec"; 
+    const MODO_PRUEBA = true; // Cambia a false cuando inicie Julio
     
     let currentStudent = {};
     let dailyQuestions = [];
-
+    let attempts = 3;
+    let storageKey = "";
    // BANCO DE PREGUNTAS - LOTE 1 (Agosto y Septiembre)
     const questionBank = {
         "1ro Sec": [
@@ -541,15 +543,10 @@
             { q: "(Hist. Universal) ¿Qué lección fundamental dejó la crisis de los misiles de Cuba sobre el uso de armas nucleares?", options: ["Que las bombas atómicas deben usarse rápidamente antes de que el enemigo ataque.", "Que la disuasión nuclear funciona solo si las potencias mantienen una comunicación constante (creación del 'Teléfono Rojo') para evitar guerras por malentendidos.", "Que las armas nucleares son inofensivas si explotan sobre el océano."], a: 1 }
         ]
     };
-    };
-
     function switchScreen(screenId) {
         document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
         document.getElementById(screenId).classList.add('active');
     }
-
-    let attempts = 3;
-    let storageKey = "";
 
     async function login() {
         const codigo = document.getElementById('codigo-input').value.trim();
@@ -561,15 +558,9 @@
         const mesActual = hoy.getMonth() + 1; // Enero es 0, Julio es 7
         const diaActual = hoy.getDate();
         
-        // Validar Fechas (Solo bloquea si MODO_PRUEBA es falso)
+        // Validar Fechas
         if (!MODO_PRUEBA && (mesActual !== 7 || diaActual < 3 || diaActual > 31)) {
             errorMsg.innerText = "Las Vacaciones de Invierno y este juego están habilitados únicamente del 3 al 31 de Julio.";
-            errorMsg.style.display = "block";
-            return;
-        }
-
-        if (!codigo) {
-            errorMsg.innerText = "Por favor ingresa tu código.";
             errorMsg.style.display = "block";
             return;
         }
@@ -594,7 +585,6 @@
             const data = await response.json();
 
             if (data.success) {
-                // Configuramos los datos asumiendo que Apps Script ahora devuelve estrellas y leaderboard
                 currentStudent = { 
                     codigo: codigo, 
                     nombre: data.estudiante, 
@@ -602,7 +592,7 @@
                     estrellas: data.estrellas || 0 
                 };
 
-                // Verificar intentos en localStorage para evitar trampas con F5
+                // Lógica de intentos guardados en el navegador
                 storageKey = `intentos_${codigo}_${hoy.getFullYear()}-${mesActual}-${diaActual}`;
                 let guardados = localStorage.getItem(storageKey);
                 
@@ -613,13 +603,11 @@
                     attempts = parseInt(guardados);
                 }
 
-                // Si ya no le quedan intentos, lo mandamos a la pantalla de fallo directamente
                 if (attempts <= 0) {
                     switchScreen('fail-screen');
                     return;
                 }
 
-                // Cargar datos en el menú
                 document.getElementById('menu-student-name').innerText = currentStudent.nombre;
                 document.getElementById('menu-student-stars').innerText = currentStudent.estrellas;
                 
@@ -647,8 +635,8 @@
                 btn.style.display = "block";
             }
         } catch (err) {
-            console.error(err); // Muestra el error detallado en la consola (F12)
-            errorMsg.innerText = "Error detectado: " + err.message; // Te lo mostrará en la pantalla
+            console.error("Error capturado:", err);
+            errorMsg.innerText = "Error de conexión. Intenta nuevamente.";
             errorMsg.style.display = "block";
             btn.style.display = "block";
         } finally {
@@ -660,76 +648,6 @@
         document.getElementById('attempts-left').innerText = attempts;
         setupQuiz();
         switchScreen('quiz-screen');
-    }
-
-    async function submitQuiz() {
-        const errorMsg = document.getElementById('quiz-error');
-        errorMsg.classList.add('hidden');
-
-        for (let i = 0; i < dailyQuestions.length; i++) {
-            if (dailyQuestions[i].userAnswer === undefined) {
-                errorMsg.innerText = "Por favor, analiza y responde todas las preguntas antes de continuar.";
-                errorMsg.classList.remove('hidden');
-                return;
-            }
-        }
-
-        // Verificar respuestas
-        let score = 0;
-        dailyQuestions.forEach(q => { if (q.userAnswer === q.correctShuffledIndex) score++; });
-
-        // Lógica de fallos y pérdida de intentos
-        if (score < 3) {
-            attempts--;
-            localStorage.setItem(storageKey, attempts); // Guardamos el nuevo valor para evitar trampas
-            document.getElementById('attempts-left').innerText = attempts;
-
-            if (attempts <= 0) {
-                switchScreen('fail-screen');
-            } else {
-                errorMsg.innerText = `Incorrecto (Acertaste ${score} de 3). Te quedan ${attempts} intento(s). Corrige y vuelve a intentar.`;
-                errorMsg.classList.remove('hidden');
-            }
-            return;
-        }
-
-        // Si acierta 3 de 3, procedemos a registrar
-        const btn = document.getElementById('btn-submit');
-        const loader = document.getElementById('quiz-loader');
-        
-        btn.style.display = "none";
-        loader.style.display = "block";
-
-        try {
-            const response = await fetch(APPS_SCRIPT_URL, {
-                method: "POST",
-                body: JSON.stringify({ 
-                    action: "register", 
-                    codigo: currentStudent.codigo,
-                    nombre: currentStudent.nombre,
-                    curso: currentStudent.curso
-                }),
-                headers: { "Content-Type": "text/plain;charset=utf-8" }
-            });
-            
-            const data = await response.json();
-
-            if (data.success) {
-                // Actualizar estrellas visualmente y mostrar pantalla de éxito
-                currentStudent.estrellas++;
-                switchScreen('success-screen');
-            } else {
-                errorMsg.innerText = data.message;
-                errorMsg.classList.remove('hidden');
-                btn.style.display = "block";
-            }
-        } catch (err) {
-            errorMsg.innerText = "Error registrando asistencia. Revisa tu conexión de internet.";
-            errorMsg.classList.remove('hidden');
-            btn.style.display = "block";
-        } finally {
-            loader.style.display = "none";
-        }
     }
 
     // Generador de números pseudoaleatorios con semilla
@@ -745,7 +663,6 @@
         const hoy = new Date();
         let dia = hoy.getDate();
 
-        // Si estamos en Modo Prueba y fuera de fecha, forzamos el "Día 3" para simular el inicio
         if (MODO_PRUEBA && (hoy.getMonth() + 1 !== 7 || dia < 3 || dia > 31)) {
             dia = 3; 
             document.getElementById('current-day').innerText = "TEST (Día 3)";
@@ -760,19 +677,14 @@
         let bank = questionBank[cursoData];
         if (!bank || bank.length < 3) bank = questionBank["1ro Sec"]; 
 
-        // LÓGICA DE AZAR CON SEMILLA
         let seed = dia; 
         for (let i = 0; i < currentStudent.codigo.length; i++) {
             seed += currentStudent.codigo.charCodeAt(i); 
         }
 
-        // Clonar y mezclar el banco de preguntas usando la semilla
         let shuffledBank = [...bank].sort(() => 0.5 - seededRandom(seed));
-        
-        // Seleccionar exactamente 3 preguntas
         dailyQuestions = shuffledBank.slice(0, 3);
         
-        // Opcional: Mezclar las opciones dentro de cada pregunta (también con semilla)
         dailyQuestions.forEach(q => {
             let optionsWithIndex = q.options.map((opt, index) => ({ opt, originalIndex: index }));
             optionsWithIndex.sort(() => 0.5 - seededRandom(seed + 1));
@@ -828,13 +740,20 @@
             }
         }
 
-        // Verificar respuestas
         let score = 0;
         dailyQuestions.forEach(q => { if (q.userAnswer === q.correctShuffledIndex) score++; });
 
         if (score < 3) {
-            errorMsg.innerText = `Has acertado ${score} de 3. Relee detenidamente tus respuestas e inténtalo de nuevo para lograr el registro.`;
-            errorMsg.classList.remove('hidden');
+            attempts--;
+            localStorage.setItem(storageKey, attempts); 
+            document.getElementById('attempts-left').innerText = attempts;
+
+            if (attempts <= 0) {
+                switchScreen('fail-screen');
+            } else {
+                errorMsg.innerText = `Incorrecto (Acertaste ${score} de 3). Te quedan ${attempts} intento(s). Corrige y vuelve a intentar.`;
+                errorMsg.classList.remove('hidden');
+            }
             return;
         }
 
@@ -859,6 +778,8 @@
             const data = await response.json();
 
             if (data.success) {
+                currentStudent.estrellas++;
+                document.getElementById('menu-student-stars').innerText = currentStudent.estrellas;
                 switchScreen('success-screen');
             } else {
                 errorMsg.innerText = data.message;
@@ -866,6 +787,7 @@
                 btn.style.display = "block";
             }
         } catch (err) {
+            console.error("Error al registrar:", err);
             errorMsg.innerText = "Error registrando asistencia. Revisa tu conexión de internet.";
             errorMsg.classList.remove('hidden');
             btn.style.display = "block";
