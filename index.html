@@ -604,8 +604,8 @@
             const mesActual = hoy.getMonth() + 1;
             const diaActual = hoy.getDate();
             
-            if (!MODO_PRUEBA && (mesActual !== 7 || diaActual < 3 || diaActual > 31)) {
-                errorMsgContainer.innerText = "El juego está habilitado únicamente del 3 al 31 de Julio.";
+            if (!MODO_PRUEBA && (mesActual !== 7 || diaActual < 6 || diaActual > 31)) {
+                errorMsgContainer.innerText = "El juego está habilitado únicamente del 6 al 31 de Julio.";
                 errorMsgContainer.style.display = "block";
                 return;
             }
