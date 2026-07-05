@@ -179,6 +179,7 @@
             </div>
         </div>
 
+        <!-- PANTALLA: ÉXITO -->
         <div id="success-screen" class="screen w-full glass-card p-10 text-center">
             <div class="relative w-24 h-24 mx-auto mb-6">
                 <div class="absolute inset-0 bg-green-100 rounded-full animate-ping opacity-75"></div>
@@ -188,17 +189,27 @@
             </div>
             <h2 class="text-3xl font-black mb-3 text-slate-800">¡Misión Cumplida!</h2>
             <p class="text-slate-600 font-bold text-lg mb-6 leading-relaxed">Respuestas correctas. Has ganado <span class="text-orange-500 font-black">1 Estrella ⭐</span> y tu asistencia ha sido registrada.</p>
-            <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">Nos vemos mañana</p>
+            <p class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-8">Nos vemos mañana</p>
+            
+            <button onclick="logout()" class="btn-animated w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-black py-4 rounded-xl shadow-sm transition text-lg uppercase tracking-wide">
+                Volver al Inicio
+            </button>
         </div>
 
+        <!-- PANTALLA: FALLO -->
         <div id="fail-screen" class="screen w-full glass-card p-10 text-center">
             <div class="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-red-200">
                 <span class="material-icons-round text-5xl text-red-500">heart_broken</span>
             </div>
             <h2 class="text-3xl font-black mb-3 text-slate-800">Intentos Agotados</h2>
             <p class="text-slate-600 font-bold text-lg mb-6 leading-relaxed">Has fallado tus 3 intentos de hoy. Perdiste la oportunidad de ganar la estrella diaria.</p>
-            <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">Repasa para mañana</p>
+            <p class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-8">Repasa para mañana</p>
+            
+            <button onclick="logout()" class="btn-animated w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-black py-4 rounded-xl shadow-sm transition text-lg uppercase tracking-wide">
+                Volver al Inicio
+            </button>
         </div>
+        
 
     </main>
 
@@ -594,6 +605,14 @@
             document.getElementById(screenId).classList.add('active');
         }
 
+        // Función para limpiar y volver a la pantalla de inicio
+        function logout() {
+            document.getElementById('codigo-input').value = "";
+            document.getElementById('error-msg').style.display = "none";
+            document.getElementById('btn-login').style.display = "flex";
+            switchScreen('login-screen');
+        }
+
         async function login() {
             const codigo = document.getElementById('codigo-input').value.trim();
             const errorMsgContainer = document.getElementById('error-msg');
@@ -604,8 +623,8 @@
             const mesActual = hoy.getMonth() + 1;
             const diaActual = hoy.getDate();
             
-            if (!MODO_PRUEBA && (mesActual !== 7 || diaActual < 6 || diaActual > 31)) {
-                errorMsgContainer.innerText = "El juego está habilitado únicamente del 6 al 31 de Julio.";
+            if (!MODO_PRUEBA && (mesActual !== 7 || diaActual < 3 || diaActual > 31)) {
+                errorMsgContainer.innerText = "El juego está habilitado únicamente del 3 al 31 de Julio.";
                 errorMsgContainer.style.display = "block";
                 return;
             }
@@ -660,11 +679,28 @@
                     
                     if (data.leaderboard && data.leaderboard.length > 0) {
                         data.leaderboard.forEach((est, idx) => {
-                            let medalla = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : '⭐';
+                            let styling = "";
+                            let medalla = "";
+                            
+                            // Estética dinámica para Oro, Plata y Bronce
+                            if (idx === 0) {
+                                medalla = '🥇';
+                                styling = "bg-yellow-50 border-yellow-400 text-yellow-700 shadow-md transform scale-105 z-10 relative";
+                            } else if (idx === 1) {
+                                medalla = '🥈';
+                                styling = "bg-slate-100 border-slate-400 text-slate-700 shadow-md";
+                            } else if (idx === 2) {
+                                medalla = '🥉';
+                                styling = "bg-orange-50 border-orange-400 text-orange-800 shadow-sm";
+                            } else {
+                                medalla = '⭐';
+                                styling = "bg-white border-slate-100 text-slate-500 opacity-90";
+                            }
+
                             leaderList.innerHTML += `
-                            <li class="flex justify-between items-center p-4 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-indigo-200 transition-colors">
-                                <span class="font-bold text-slate-700 flex items-center gap-2">${medalla} ${est.nombre}</span>
-                                <span class="font-black text-orange-500">${est.estrellas} pts</span>
+                            <li class="flex justify-between items-center p-4 rounded-xl border-2 transition-colors ${styling}">
+                                <span class="font-black flex items-center gap-2 tracking-wide">${medalla} ${est.nombre}</span>
+                                <span class="font-black text-lg drop-shadow-sm">${est.estrellas} pts</span>
                             </li>`;
                         });
                     } else {
