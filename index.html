@@ -647,7 +647,8 @@
                 btn.style.display = "block";
             }
         } catch (err) {
-            errorMsg.innerText = "Error de conexión. Intenta nuevamente.";
+            console.error(err); // Muestra el error detallado en la consola (F12)
+            errorMsg.innerText = "Error detectado: " + err.message; // Te lo mostrará en la pantalla
             errorMsg.style.display = "block";
             btn.style.display = "block";
         } finally {
