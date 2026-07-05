@@ -3,172 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Winter Challenge - Teacher Ivan</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Desafío de Historia - Teacher Ivan</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
         :root {
-            --azul-primario: #0A468C; 
-            --naranja-vibrante: #F56E1E; 
-            --azul-claro: #96C8E6; 
-            --gris-neutro: #C8CDD2; 
-            --blanco-nieve: #FAFAF0; 
-            --blanco-puro: #FFFFFF;
-            --font-titulares: 'Montserrat', sans-serif; 
-            --font-cuerpo: 'Open Sans', sans-serif; 
+            --bg-gradient-start: #0f172a;
+            --bg-gradient-end: #1e1b4b;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --primary: #4f46e5;
+            --accent: #f97316;
+            --text-dark: #1e293b;
         }
 
-        body { font-family: var(--font-cuerpo); background-color: var(--blanco-nieve); color: var(--azul-primario); }
-        h1, h2, h3, h4 { font-family: var(--font-titulares); }
+        body { 
+            font-family: 'Nunito', sans-serif; 
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            background-attachment: fixed;
+            color: var(--text-dark);
+        }
+        
+        h1, h2, h3, .font-title { font-family: 'Montserrat', sans-serif; }
 
+        /* Tarjetas con efecto Cristal (Glassmorphism) y Sombras Suaves */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Ocultar / Mostrar Pantallas con Animación */
+        .screen { display: none; opacity: 0; }
+        .screen.active { 
+            display: block; 
+            animation: slideFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+        }
+
+        @keyframes slideFadeUp {
+            0% { opacity: 0; transform: translateY(30px) scale(0.98); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Botones Animados (Efecto Táctil) */
+        .btn-animated {
+            transition: all 0.2s ease;
+        }
+        .btn-animated:active {
+            transform: scale(0.95);
+        }
+
+        /* Opciones del Quiz */
+        .quiz-option {
+            transition: all 0.3s ease;
+            border: 2px solid #e2e8f0;
+            background: #ffffff;
+            border-radius: 1rem;
+        }
+        .quiz-option:hover {
+            border-color: #cbd5e1;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+        .quiz-option.selected {
+            background-color: #eff6ff;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Loader */
         .loader {
-            border: 4px solid var(--gris-neutro);
-            border-top: 4px solid var(--naranja-vibrante);
+            border: 4px solid rgba(79, 70, 229, 0.2);
+            border-left-color: var(--primary);
             border-radius: 50%;
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
             margin: 20px auto;
         }
-
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .quiz-option {
-            transition: all 0.2s ease-in-out;
-            cursor: pointer;
-            background-color: var(--blanco-puro);
-            border: 2px solid var(--azul-claro);
-            color: var(--azul-primario);
-        }
-        .quiz-option:hover { border-color: var(--naranja-vibrante); }
-        .quiz-option.selected {
-            background-color: var(--azul-primario);
-            border-color: var(--azul-primario);
-            color: var(--blanco-puro);
-        }
-        
-        #error-msg { display: none; color: #ef4444; font-weight: 600; margin-top: 10px; }
-        
-        /* Ocultar secciones dinámicamente */
-        .screen { display: none; }
-        .screen.active { display: block; animation: fadeIn 0.5s ease; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased">
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-indigo-500 selection:text-white">
 
-    <header class="bg-[#0A468C] text-white p-4 shadow-md sticky top-0 z-10">
-        <div class="max-w-4xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <span class="material-icons-round text-3xl text-[#F56E1E]">ac_unit</span>
-                <h1 class="text-xl md:text-2xl font-extrabold tracking-wide">Winter Challenge</h1>
-            </div>
-            <div class="text-sm font-semibold hidden md:block">Colegio Fielding • Teacher Ivan</div>
+    <header class="pt-10 pb-4 px-4 text-center z-10">
+        <div class="inline-block bg-white/10 backdrop-blur-md px-6 py-2 rounded-full border border-white/20 mb-3 shadow-lg">
+            <h1 class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-300 drop-shadow-sm uppercase tracking-wide">
+                Desafío de Historia
+            </h1>
         </div>
+        <h2 class="text-xl font-bold text-indigo-200 tracking-wider">Teacher Ivan</h2>
     </header>
 
-    <main class="flex-grow flex items-center justify-center p-4">
+    <main class="flex-grow flex items-center justify-center p-4 w-full max-w-lg mx-auto">
         
-        <!-- LOGIN SCREEN -->
-        <div id="login-screen" class="screen active max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-[#C8CDD2]">
-            <h2 class="text-2xl font-bold mb-2 text-center text-[#0A468C]">Registro Diario</h2>
-            <p class="text-center text-sm text-gray-500 mb-6">Ingresa tu código de estudiante para acceder a las preguntas de hoy.</p>
+        <div id="login-screen" class="screen active w-full glass-card p-8">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+                    <span class="material-icons-round text-5xl text-indigo-600">sports_esports</span>
+                </div>
+                <h2 class="text-2xl font-black text-slate-800">Misión Diaria</h2>
+                <p class="text-slate-500 font-semibold mt-2">Ingresa tu código de acceso para comenzar el desafío de hoy.</p>
+            </div>
             
-            <input type="text" id="codigo-input" placeholder="Ej: 1RO-06" class="w-full text-center uppercase font-bold text-xl p-4 border-2 border-[#96C8E6] rounded-xl focus:outline-none focus:border-[#F56E1E] transition mb-4">
+            <input type="text" id="codigo-input" placeholder="EJ: 1RO-06" class="w-full text-center uppercase font-black text-2xl p-5 border-2 border-slate-200 rounded-2xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all mb-6 text-slate-700 placeholder-slate-300">
             
-            <button onclick="login()" id="btn-login" class="w-full bg-[#F56E1E] hover:bg-[#d65d18] text-white font-bold py-4 rounded-xl shadow-lg transition text-lg">
-                Iniciar Misión Diaria
+            <button onclick="login()" id="btn-login" class="btn-animated w-full bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-600 hover:to-orange-500 text-white font-black text-xl py-5 rounded-2xl shadow-xl shadow-orange-500/30 flex items-center justify-center gap-2">
+                <span>Ingresar</span>
+                <span class="material-icons-round">arrow_forward</span>
             </button>
             <div id="login-loader" class="loader" style="display: none;"></div>
-            <p id="error-msg" class="text-center"></p>
+            <p id="error-msg" class="text-center text-red-500 font-bold mt-4" style="display: none;"></p>
         </div>
 
-        <!-- MENU & LEADERBOARD SCREEN -->
-        <div id="menu-screen" class="screen max-w-2xl w-full bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-[#C8CDD2]">
-            <div class="text-center mb-6">
-                <!-- Imagen Histórica (Tiwanaku - Dominio Público) -->
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Tiwanaku_Gate_of_the_Sun.jpg/800px-Tiwanaku_Gate_of_the_Sun.jpg" alt="Historia" class="w-full h-48 md:h-64 object-cover rounded-xl mb-4 shadow-md border-2 border-[#0A468C]">
+        <div id="menu-screen" class="screen w-full glass-card p-6 md:p-8">
+            <div class="text-center mb-8">
+                <div class="relative rounded-2xl overflow-hidden shadow-lg border-4 border-white mb-6 bg-slate-100">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Tiwanaku_Gate_of_the_Sun.jpg/800px-Tiwanaku_Gate_of_the_Sun.jpg" alt="Historia" class="w-full h-48 md:h-56 object-cover transform hover:scale-105 transition-transform duration-700">
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 text-left">
+                        <p class="text-white font-bold text-sm">Explorando el pasado</p>
+                    </div>
+                </div>
                 
-                <h2 class="text-3xl font-bold text-[#0A468C]">Bienvenido, <span id="menu-student-name"></span></h2>
-                <p class="text-xl text-[#F56E1E] font-bold mt-2">Tus Estrellas: <span id="menu-student-stars">0</span> ⭐</p>
+                <h2 class="text-3xl font-black text-slate-800">Hola, <span id="menu-student-name" class="text-indigo-600"></span></h2>
+                <div class="inline-flex items-center gap-2 bg-orange-100 px-4 py-2 rounded-full mt-3 border border-orange-200 shadow-sm">
+                    <span class="material-icons-round text-orange-500 text-xl">star</span>
+                    <p class="text-lg text-orange-700 font-black">Tus Estrellas: <span id="menu-student-stars">0</span></p>
+                </div>
             </div>
             
-            <button onclick="startQuiz()" class="w-full bg-[#0A468C] hover:bg-blue-800 text-white font-bold py-4 rounded-xl shadow-lg transition text-lg mb-8 uppercase tracking-wide">
-                Jugar Quiz de Hoy
+            <button onclick="startQuiz()" class="btn-animated w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white font-black py-5 rounded-2xl shadow-xl shadow-indigo-500/30 text-xl mb-8 uppercase tracking-wide">
+                Iniciar Quiz
             </button>
 
-            <!-- Leaderboard -->
-            <div class="bg-gray-50 rounded-xl p-6 border-2 border-[#96C8E6]">
-                <h3 class="text-xl font-bold text-[#0A468C] mb-4 flex items-center justify-center gap-2 uppercase">
-                    <span class="material-icons-round">leaderboard</span> Top Estudiantes
+            <div class="bg-slate-50/80 rounded-2xl p-6 border border-slate-200 shadow-inner">
+                <h3 class="text-lg font-black text-slate-700 mb-4 flex items-center justify-center gap-2 uppercase tracking-widest">
+                    <span class="material-icons-round text-indigo-500">leaderboard</span> Top Estudiantes
                 </h3>
                 <ul id="leaderboard-list" class="space-y-3">
-                    <!-- El Leaderboard se inyecta desde JS -->
-                </ul>
+                    </ul>
             </div>
         </div>
 
-        <!-- QUIZ SCREEN -->
-        <div id="quiz-screen" class="screen max-w-3xl w-full bg-white rounded-2xl shadow-xl p-6 md:p-10 border border-[#C8CDD2]">
-            <div class="flex justify-between items-center mb-6 border-b pb-4">
-                <div>
-                    <h2 class="text-2xl font-bold text-[#0A468C]" id="student-name">Hola, Estudiante</h2>
-                    <p class="text-sm font-semibold text-[#F56E1E]" id="student-course">Curso</p>
+        <div id="quiz-screen" class="screen w-full glass-card p-6 md:p-8">
+            <div class="flex flex-wrap justify-between items-center mb-6 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <div class="w-full sm:w-auto mb-2 sm:mb-0">
+                    <h2 class="text-xl font-black text-slate-800 truncate" id="student-name">Estudiante</h2>
+                    <p class="text-sm font-bold text-orange-500 uppercase tracking-wider" id="student-course">Curso</p>
                 </div>
-                <div class="flex flex-col items-end gap-2">
-                    <div class="bg-[#96C8E6] text-[#0A468C] px-4 py-1 rounded-lg font-bold text-sm">
-                        Día: <span id="current-day">0</span> de Julio
+                <div class="flex items-center gap-3">
+                    <div class="bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg font-bold text-xs uppercase shadow-sm">
+                        Julio <span id="current-day" class="text-sm">0</span>
                     </div>
-                    <!-- Contador de Intentos -->
-                    <div class="bg-[#ef4444] text-white px-4 py-1 rounded-lg font-bold text-sm flex items-center gap-1 shadow-sm">
-                        <span class="material-icons-round text-sm">favorite</span> Intentos: <span id="attempts-left">3</span>
+                    <div class="bg-red-100 text-red-600 px-3 py-1.5 rounded-lg font-bold text-xs uppercase shadow-sm flex items-center gap-1">
+                        <span class="material-icons-round text-sm">favorite</span> <span id="attempts-left">3</span>
                     </div>
                 </div>
             </div>
 
-            <div id="quiz-container" class="space-y-8">
-                <!-- Preguntas inyectadas por JS -->
-            </div>
+            <div id="quiz-container" class="space-y-6">
+                </div>
 
-            <div class="mt-8 pt-6 border-t border-gray-200">
-                <button onclick="submitQuiz()" id="btn-submit" class="w-full bg-[#0A468C] hover:bg-blue-800 text-white font-bold py-4 rounded-xl shadow-lg transition text-lg">
+            <div class="mt-8 pt-6 border-t-2 border-slate-100">
+                <button onclick="submitQuiz()" id="btn-submit" class="btn-animated w-full bg-slate-800 hover:bg-slate-900 text-white font-black py-5 rounded-2xl shadow-lg transition text-lg uppercase tracking-wide">
                     Verificar Respuestas
                 </button>
                 <div id="quiz-loader" class="loader" style="display: none;"></div>
-                <p id="quiz-error" class="text-center mt-4 text-[#ef4444] font-bold hidden"></p>
+                <div id="quiz-error" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-xl text-center">
+                    <p class="text-red-600 font-bold"></p>
+                </div>
             </div>
         </div>
 
-        <!-- SUCCESS SCREEN -->
-        <div id="success-screen" class="screen max-w-md w-full bg-white rounded-2xl shadow-xl p-10 text-center border border-[#C8CDD2]">
-            <span class="material-icons-round text-6xl text-green-500 mb-4 block">star</span>
-            <h2 class="text-3xl font-bold mb-2 text-[#0A468C]">¡Misión Cumplida!</h2>
-            <p class="text-gray-600 font-semibold mb-6">Tus respuestas son correctas. Has ganado <span class="font-bold text-[#F56E1E]">1 Estrella ⭐</span> y tu asistencia de hoy está registrada.</p>
-            <p class="text-sm text-gray-400">Vuelve mañana para seguir sumando estrellas.</p>
+        <div id="success-screen" class="screen w-full glass-card p-10 text-center">
+            <div class="relative w-24 h-24 mx-auto mb-6">
+                <div class="absolute inset-0 bg-green-100 rounded-full animate-ping opacity-75"></div>
+                <div class="relative w-full h-full bg-green-100 rounded-full flex items-center justify-center border-4 border-green-400">
+                    <span class="material-icons-round text-5xl text-green-500">star</span>
+                </div>
+            </div>
+            <h2 class="text-3xl font-black mb-3 text-slate-800">¡Misión Cumplida!</h2>
+            <p class="text-slate-600 font-bold text-lg mb-6 leading-relaxed">Respuestas correctas. Has ganado <span class="text-orange-500 font-black">1 Estrella ⭐</span> y tu asistencia ha sido registrada.</p>
+            <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">Nos vemos mañana</p>
         </div>
 
-        <!-- FAIL SCREEN -->
-        <div id="fail-screen" class="screen max-w-md w-full bg-white rounded-2xl shadow-xl p-10 text-center border border-[#C8CDD2]">
-            <span class="material-icons-round text-6xl text-[#ef4444] mb-4 block">cancel</span>
-            <h2 class="text-3xl font-bold mb-2 text-[#0A468C]">Intentos Agotados</h2>
-            <p class="text-gray-600 font-semibold mb-6">Has fallado tus 3 intentos de hoy. Has perdido la oportunidad de ganar la estrella diaria.</p>
-            <p class="text-sm text-gray-400">Repasa tus apuntes y vuelve a intentarlo mañana.</p>
+        <div id="fail-screen" class="screen w-full glass-card p-10 text-center">
+            <div class="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-red-200">
+                <span class="material-icons-round text-5xl text-red-500">heart_broken</span>
+            </div>
+            <h2 class="text-3xl font-black mb-3 text-slate-800">Intentos Agotados</h2>
+            <p class="text-slate-600 font-bold text-lg mb-6 leading-relaxed">Has fallado tus 3 intentos de hoy. Perdiste la oportunidad de ganar la estrella diaria.</p>
+            <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">Repasa para mañana</p>
         </div>
 
     </main>
 
-   <script>
-    // ======= CONFIGURACIÓN IMPORTANTE =======
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx7hTT4qbGFxDA1ZsUyvVVOPYU7FU5OhMC4NmtPDfOEHsf1LnMFAgk9ck4ttk0Y5qSf3Q/exec"; 
-    const MODO_PRUEBA = true; // Cambia a false cuando inicie Julio
-    
-    let currentStudent = {};
-    let dailyQuestions = [];
-    let attempts = 3;
-    let storageKey = "";
+    <footer class="text-center py-6 px-4 z-10">
+        <p class="font-black text-xl text-white tracking-widest uppercase drop-shadow-md">Colegio Fielding</p>
+        <p class="text-indigo-200 text-sm font-semibold mt-1 opacity-80">&copy; 2026 Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        // ======= CONFIGURACIÓN IMPORTANTE =======
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx7hTT4qbGFxDA1ZsUyvVVOPYU7FU5OhMC4NmtPDfOEHsf1LnMFAgk9ck4ttk0Y5qSf3Q/exec"; 
+        const MODO_PRUEBA = true; // Cambia a false cuando inicie Julio
+        
+        let currentStudent = {};
+        let dailyQuestions = [];
+        let attempts = 3;
+        let storageKey = "";
    // BANCO DE PREGUNTAS - LOTE 1 (Agosto y Septiembre)
     const questionBank = {
         "1ro Sec": [
@@ -543,257 +590,255 @@
         ]
     };
     function switchScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
-    }
-
-    async function login() {
-        const codigo = document.getElementById('codigo-input').value.trim();
-        const errorMsg = document.getElementById('error-msg');
-        const btn = document.getElementById('btn-login');
-        const loader = document.getElementById('login-loader');
-
-        const hoy = new Date();
-        const mesActual = hoy.getMonth() + 1; // Enero es 0, Julio es 7
-        const diaActual = hoy.getDate();
-        
-        // Validar Fechas
-        if (!MODO_PRUEBA && (mesActual !== 7 || diaActual < 3 || diaActual > 31)) {
-            errorMsg.innerText = "Las Vacaciones de Invierno y este juego están habilitados únicamente del 3 al 31 de Julio.";
-            errorMsg.style.display = "block";
-            return;
+            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
         }
 
-        if (!codigo) {
-            errorMsg.innerText = "Por favor ingresa tu código.";
-            errorMsg.style.display = "block";
-            return;
-        }
+        async function login() {
+            const codigo = document.getElementById('codigo-input').value.trim();
+            const errorMsgContainer = document.getElementById('error-msg');
+            const btn = document.getElementById('btn-login');
+            const loader = document.getElementById('login-loader');
 
-        errorMsg.style.display = "none";
-        btn.style.display = "none";
-        loader.style.display = "block";
-
-        try {
-            const response = await fetch(APPS_SCRIPT_URL, {
-                method: "POST",
-                body: JSON.stringify({ action: "login", codigo: codigo }),
-                headers: { "Content-Type": "text/plain;charset=utf-8" }
-            });
+            const hoy = new Date();
+            const mesActual = hoy.getMonth() + 1;
+            const diaActual = hoy.getDate();
             
-            const data = await response.json();
+            if (!MODO_PRUEBA && (mesActual !== 7 || diaActual < 3 || diaActual > 31)) {
+                errorMsgContainer.innerText = "El juego está habilitado únicamente del 3 al 31 de Julio.";
+                errorMsgContainer.style.display = "block";
+                return;
+            }
 
-            if (data.success) {
-                currentStudent = { 
-                    codigo: codigo, 
-                    nombre: data.estudiante, 
-                    curso: data.curso,
-                    estrellas: data.estrellas || 0 
-                };
+            if (!codigo) {
+                errorMsgContainer.innerText = "Por favor ingresa tu código.";
+                errorMsgContainer.style.display = "block";
+                return;
+            }
 
-                // Lógica de intentos guardados en el navegador
-                storageKey = `intentos_${codigo}_${hoy.getFullYear()}-${mesActual}-${diaActual}`;
-                let guardados = localStorage.getItem(storageKey);
+            errorMsgContainer.style.display = "none";
+            btn.style.display = "none";
+            loader.style.display = "block";
+
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "login", codigo: codigo }),
+                    headers: { "Content-Type": "text/plain;charset=utf-8" }
+                });
                 
-                if (guardados === null) {
-                    attempts = 3;
-                    localStorage.setItem(storageKey, attempts);
+                const data = await response.json();
+
+                if (data.success) {
+                    currentStudent = { 
+                        codigo: codigo, 
+                        nombre: data.estudiante, 
+                        curso: data.curso,
+                        estrellas: data.estrellas || 0 
+                    };
+
+                    storageKey = `intentos_${codigo}_${hoy.getFullYear()}-${mesActual}-${diaActual}`;
+                    let guardados = localStorage.getItem(storageKey);
+                    
+                    if (guardados === null) {
+                        attempts = 3;
+                        localStorage.setItem(storageKey, attempts);
+                    } else {
+                        attempts = parseInt(guardados);
+                    }
+
+                    if (attempts <= 0) {
+                        switchScreen('fail-screen');
+                        return;
+                    }
+
+                    document.getElementById('menu-student-name').innerText = currentStudent.nombre;
+                    document.getElementById('menu-student-stars').innerText = currentStudent.estrellas;
+                    
+                    const leaderList = document.getElementById('leaderboard-list');
+                    leaderList.innerHTML = "";
+                    
+                    if (data.leaderboard && data.leaderboard.length > 0) {
+                        data.leaderboard.forEach((est, idx) => {
+                            let medalla = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : '⭐';
+                            leaderList.innerHTML += `
+                            <li class="flex justify-between items-center p-4 bg-white rounded-xl shadow-sm border border-slate-100 hover:border-indigo-200 transition-colors">
+                                <span class="font-bold text-slate-700 flex items-center gap-2">${medalla} ${est.nombre}</span>
+                                <span class="font-black text-orange-500">${est.estrellas} pts</span>
+                            </li>`;
+                        });
+                    } else {
+                        leaderList.innerHTML = `<p class="text-center text-slate-400 font-bold py-4">El tablero se actualizará pronto.</p>`;
+                    }
+
+                    switchScreen('menu-screen');
+
                 } else {
-                    attempts = parseInt(guardados);
+                    errorMsgContainer.innerText = data.message;
+                    errorMsgContainer.style.display = "block";
+                    btn.style.display = "flex";
                 }
+            } catch (err) {
+                console.error("Error capturado:", err);
+                errorMsgContainer.innerText = "Error de conexión. Intenta nuevamente.";
+                errorMsgContainer.style.display = "block";
+                btn.style.display = "flex";
+            } finally {
+                loader.style.display = "none";
+            }
+        }
+
+        function startQuiz() {
+            document.getElementById('attempts-left').innerText = attempts;
+            setupQuiz();
+            switchScreen('quiz-screen');
+        }
+
+        function seededRandom(seed) {
+            var x = Math.sin(seed++) * 10000;
+            return x - Math.floor(x);
+        }
+
+        function setupQuiz() {
+            document.getElementById('student-name').innerText = currentStudent.nombre;
+            document.getElementById('student-course').innerText = currentStudent.curso;
+            
+            const hoy = new Date();
+            let dia = hoy.getDate();
+
+            if (MODO_PRUEBA && (hoy.getMonth() + 1 !== 7 || dia < 3 || dia > 31)) {
+                dia = 3; 
+                document.getElementById('current-day').innerText = "Test(3)";
+            } else {
+                document.getElementById('current-day').innerText = dia;
+            }
+
+            let cursoData = currentStudent.curso.includes("1ro") ? "1ro Sec" : 
+                            currentStudent.curso.includes("2do") ? "2do Sec" :
+                            currentStudent.curso.includes("3ro") ? "3ro Sec" : "4to Sec"; 
+            
+            let bank = questionBank[cursoData];
+            if (!bank || bank.length < 3) bank = questionBank["1ro Sec"]; 
+
+            let seed = dia; 
+            for (let i = 0; i < currentStudent.codigo.length; i++) {
+                seed += currentStudent.codigo.charCodeAt(i); 
+            }
+
+            let shuffledBank = [...bank].sort(() => 0.5 - seededRandom(seed));
+            dailyQuestions = shuffledBank.slice(0, 3);
+            
+            dailyQuestions.forEach(q => {
+                let optionsWithIndex = q.options.map((opt, index) => ({ opt, originalIndex: index }));
+                optionsWithIndex.sort(() => 0.5 - seededRandom(seed + 1));
+                
+                q.shuffledOptions = optionsWithIndex.map(o => o.opt);
+                q.correctShuffledIndex = optionsWithIndex.findIndex(o => o.originalIndex === q.a);
+            });
+
+            renderQuestions();
+        }
+
+        function renderQuestions() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = "";
+
+            dailyQuestions.forEach((qObj, index) => {
+                let html = `
+                <div class="mb-8" data-qindex="${index}">
+                    <h3 class="text-lg font-black mb-4 text-slate-700 leading-snug"><span class="text-indigo-500">${index + 1}.</span> ${qObj.q}</h3>
+                    <div class="space-y-3">
+                        ${qObj.shuffledOptions.map((opt, optIndex) => `
+                            <div class="quiz-option p-4 md:p-5 flex items-start gap-4" onclick="selectOption(this, ${index}, ${optIndex})">
+                                <div class="w-6 h-6 rounded-full border-2 border-slate-300 flex items-center justify-center inner-circle flex-shrink-0 mt-0.5"></div>
+                                <span class="font-bold text-slate-600">${opt}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        function selectOption(el, qIndex, optIndex) {
+            const parent = el.closest(`[data-qindex="${qIndex}"]`);
+            parent.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('selected');
+                opt.querySelector('.inner-circle').innerHTML = "";
+            });
+            el.classList.add('selected');
+            el.querySelector('.inner-circle').innerHTML = `<div class="w-3 h-3 bg-indigo-500 rounded-full"></div>`;
+            dailyQuestions[qIndex].userAnswer = optIndex;
+        }
+
+        async function submitQuiz() {
+            const errorMsgContainer = document.getElementById('quiz-error');
+            const errorText = errorMsgContainer.querySelector('p');
+            errorMsgContainer.classList.add('hidden');
+
+            for (let i = 0; i < dailyQuestions.length; i++) {
+                if (dailyQuestions[i].userAnswer === undefined) {
+                    errorText.innerText = "Por favor, analiza y responde todas las preguntas antes de verificar.";
+                    errorMsgContainer.classList.remove('hidden');
+                    return;
+                }
+            }
+
+            let score = 0;
+            dailyQuestions.forEach(q => { if (q.userAnswer === q.correctShuffledIndex) score++; });
+
+            if (score < 3) {
+                attempts--;
+                localStorage.setItem(storageKey, attempts); 
+                document.getElementById('attempts-left').innerText = attempts;
 
                 if (attempts <= 0) {
                     switchScreen('fail-screen');
-                    return;
-                }
-
-                document.getElementById('menu-student-name').innerText = currentStudent.nombre;
-                document.getElementById('menu-student-stars').innerText = currentStudent.estrellas;
-                
-                const leaderList = document.getElementById('leaderboard-list');
-                leaderList.innerHTML = "";
-                
-                if (data.leaderboard && data.leaderboard.length > 0) {
-                    data.leaderboard.forEach((est, idx) => {
-                        let medalla = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : '⭐';
-                        leaderList.innerHTML += `
-                        <li class="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm border border-gray-200">
-                            <span class="font-bold text-[#0A468C]">${medalla} ${est.nombre}</span>
-                            <span class="font-bold text-[#F56E1E]">${est.estrellas} pts</span>
-                        </li>`;
-                    });
                 } else {
-                    leaderList.innerHTML = `<p class="text-center text-gray-500 italic">El tablero se actualizará pronto.</p>`;
+                    errorText.innerText = `Acertaste ${score} de 3. Te quedan ${attempts} intento(s). Corrige tus respuestas.`;
+                    errorMsgContainer.classList.remove('hidden');
                 }
-
-                switchScreen('menu-screen');
-
-            } else {
-                errorMsg.innerText = data.message;
-                errorMsg.style.display = "block";
-                btn.style.display = "block";
-            }
-        } catch (err) {
-            console.error("Error capturado:", err);
-            errorMsg.innerText = "Error de conexión. Intenta nuevamente.";
-            errorMsg.style.display = "block";
-            btn.style.display = "block";
-        } finally {
-            loader.style.display = "none";
-        }
-    }
-
-    function startQuiz() {
-        document.getElementById('attempts-left').innerText = attempts;
-        setupQuiz();
-        switchScreen('quiz-screen');
-    }
-
-    // Generador de números pseudoaleatorios con semilla
-    function seededRandom(seed) {
-        var x = Math.sin(seed++) * 10000;
-        return x - Math.floor(x);
-    }
-
-    function setupQuiz() {
-        document.getElementById('student-name').innerText = currentStudent.nombre;
-        document.getElementById('student-course').innerText = currentStudent.curso;
-        
-        const hoy = new Date();
-        let dia = hoy.getDate();
-
-        if (MODO_PRUEBA && (hoy.getMonth() + 1 !== 7 || dia < 3 || dia > 31)) {
-            dia = 3; 
-            document.getElementById('current-day').innerText = "TEST (Día 3)";
-        } else {
-            document.getElementById('current-day').innerText = dia;
-        }
-
-        let cursoData = currentStudent.curso.includes("1ro") ? "1ro Sec" : 
-                        currentStudent.curso.includes("2do") ? "2do Sec" :
-                        currentStudent.curso.includes("3ro") ? "3ro Sec" : "4to Sec"; 
-        
-        let bank = questionBank[cursoData];
-        if (!bank || bank.length < 3) bank = questionBank["1ro Sec"]; 
-
-        let seed = dia; 
-        for (let i = 0; i < currentStudent.codigo.length; i++) {
-            seed += currentStudent.codigo.charCodeAt(i); 
-        }
-
-        let shuffledBank = [...bank].sort(() => 0.5 - seededRandom(seed));
-        dailyQuestions = shuffledBank.slice(0, 3);
-        
-        dailyQuestions.forEach(q => {
-            let optionsWithIndex = q.options.map((opt, index) => ({ opt, originalIndex: index }));
-            optionsWithIndex.sort(() => 0.5 - seededRandom(seed + 1));
-            
-            q.shuffledOptions = optionsWithIndex.map(o => o.opt);
-            q.correctShuffledIndex = optionsWithIndex.findIndex(o => o.originalIndex === q.a);
-        });
-
-        renderQuestions();
-    }
-
-    function renderQuestions() {
-        const container = document.getElementById('quiz-container');
-        container.innerHTML = "";
-
-        dailyQuestions.forEach((qObj, index) => {
-            let html = `
-            <div class="mb-6" data-qindex="${index}">
-                <h3 class="text-lg font-bold mb-3 text-[#0A468C]">${index + 1}. ${qObj.q}</h3>
-                <div class="space-y-3">
-                    ${qObj.shuffledOptions.map((opt, optIndex) => `
-                        <div class="quiz-option p-4 rounded-xl text-sm md:text-base font-semibold flex items-center gap-3" onclick="selectOption(this, ${index}, ${optIndex})">
-                            <div class="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center inner-circle flex-shrink-0"></div>
-                            <span>${opt}</span>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>`;
-            container.innerHTML += html;
-        });
-    }
-
-    function selectOption(el, qIndex, optIndex) {
-        const parent = el.closest(`[data-qindex="${qIndex}"]`);
-        parent.querySelectorAll('.quiz-option').forEach(opt => {
-            opt.classList.remove('selected');
-            opt.querySelector('.inner-circle').innerHTML = "";
-        });
-        el.classList.add('selected');
-        el.querySelector('.inner-circle').innerHTML = `<div class="w-3 h-3 bg-white rounded-full"></div>`;
-        dailyQuestions[qIndex].userAnswer = optIndex;
-    }
-
-    async function submitQuiz() {
-        const errorMsg = document.getElementById('quiz-error');
-        errorMsg.classList.add('hidden');
-
-        for (let i = 0; i < dailyQuestions.length; i++) {
-            if (dailyQuestions[i].userAnswer === undefined) {
-                errorMsg.innerText = "Por favor, analiza y responde todas las preguntas antes de continuar.";
-                errorMsg.classList.remove('hidden');
                 return;
             }
-        }
 
-        let score = 0;
-        dailyQuestions.forEach(q => { if (q.userAnswer === q.correctShuffledIndex) score++; });
-
-        if (score < 3) {
-            attempts--;
-            localStorage.setItem(storageKey, attempts); 
-            document.getElementById('attempts-left').innerText = attempts;
-
-            if (attempts <= 0) {
-                switchScreen('fail-screen');
-            } else {
-                errorMsg.innerText = `Incorrecto (Acertaste ${score} de 3). Te quedan ${attempts} intento(s). Corrige y vuelve a intentar.`;
-                errorMsg.classList.remove('hidden');
-            }
-            return;
-        }
-
-        const btn = document.getElementById('btn-submit');
-        const loader = document.getElementById('quiz-loader');
-        
-        btn.style.display = "none";
-        loader.style.display = "block";
-
-        try {
-            const response = await fetch(APPS_SCRIPT_URL, {
-                method: "POST",
-                body: JSON.stringify({ 
-                    action: "register", 
-                    codigo: currentStudent.codigo,
-                    nombre: currentStudent.nombre,
-                    curso: currentStudent.curso
-                }),
-                headers: { "Content-Type": "text/plain;charset=utf-8" }
-            });
+            const btn = document.getElementById('btn-submit');
+            const loader = document.getElementById('quiz-loader');
             
-            const data = await response.json();
+            btn.style.display = "none";
+            loader.style.display = "block";
 
-            if (data.success) {
-                currentStudent.estrellas++;
-                document.getElementById('menu-student-stars').innerText = currentStudent.estrellas;
-                switchScreen('success-screen');
-            } else {
-                errorMsg.innerText = data.message;
-                errorMsg.classList.remove('hidden');
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ 
+                        action: "register", 
+                        codigo: currentStudent.codigo,
+                        nombre: currentStudent.nombre,
+                        curso: currentStudent.curso
+                    }),
+                    headers: { "Content-Type": "text/plain;charset=utf-8" }
+                });
+                
+                const data = await response.json();
+
+                if (data.success) {
+                    currentStudent.estrellas++;
+                    document.getElementById('menu-student-stars').innerText = currentStudent.estrellas;
+                    switchScreen('success-screen');
+                } else {
+                    errorText.innerText = data.message;
+                    errorMsgContainer.classList.remove('hidden');
+                    btn.style.display = "block";
+                }
+            } catch (err) {
+                console.error("Error al registrar:", err);
+                errorText.innerText = "Error registrando asistencia. Revisa tu conexión de internet.";
+                errorMsgContainer.classList.remove('hidden');
                 btn.style.display = "block";
+            } finally {
+                loader.style.display = "none";
             }
-        } catch (err) {
-            console.error("Error al registrar:", err);
-            errorMsg.innerText = "Error registrando asistencia. Revisa tu conexión de internet.";
-            errorMsg.classList.remove('hidden');
-            btn.style.display = "block";
-        } finally {
-            loader.style.display = "none";
         }
-    }
-</script>
+    </script>
 </body>
 </html>
