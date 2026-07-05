@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ofimática Básica - Día 1</title>
+    <style>
+        :root {
+            --primary: #1E3A8A; /* Azul UNEFCO/Institucional */
+            --secondary: #3B82F6; /* Azul claro */
+            --accent: #F59E0B; /* Naranja para resaltar */
+            --bg-light: #F3F4F6;
+            --text-dark: #1F2937;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Evita scroll general, optimiza pantalla completa */
+        }
+
+        /* HEADER & LOGOS */
+        header {
+            background-color: var(--white);
+            height: 12vh;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 3vw;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-container img {
+            max-height: 8vh;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-container img:hover {
+            transform: scale(1.05);
+        }
+
+        h1 {
+            font-size: 1.8vw;
+            color: var(--primary);
+            text-align: center;
+            flex-grow: 1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            height: 88vh;
+            width: 100vw;
+        }
+
+        /* SIDEBAR / TABS */
+        .sidebar {
+            width: 25vw;
+            background-color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            padding: 2vh 0;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            z-index: 5;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--white);
+            padding: 2.5vh 2vw;
+            text-align: left;
+            font-size: 1.3vw;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            opacity: 0.8;
+            border-left: 5px solid transparent;
+        }
+
+        .tab-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            opacity: 1;
+        }
+
+        .tab-btn.active {
+            background-color: var(--secondary);
+            opacity: 1;
+            border-left: 5px solid var(--accent);
+            font-weight: bold;
+        }
+
+        /* CONTENT AREA */
+        .content-area {
+            width: 75vw;
+            padding: 4vh 4vw;
+            position: relative;
+            background-image: radial-gradient(circle at top right, #e0e7ff, transparent);
+            overflow-y: auto;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.6s ease forwards;
+            height: 100%;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* SLIDE ELEMENTS */
+        .slide-title {
+            font-size: 3vw;
+            color: var(--primary);
+            margin-bottom: 3vh;
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        .slide-text {
+            font-size: 1.5vw;
+            line-height: 1.6;
+            margin-bottom: 2vh;
+        }
+
+        /* INTERACTIVE CARDS */
+        .cards-container {
+            display: flex;
+            gap: 2vw;
+            margin-top: 4vh;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 3vh 2vw;
+            flex: 1;
+            min-width: 20vw;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 5px;
+            background: var(--secondary);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-icon {
+            font-size: 4vw;
+            margin-bottom: 2vh;
+            display: block;
+            animation: bounce 3s infinite ease-in-out;
+        }
+
+        .card-title {
+            font-size: 1.8vw;
+            color: var(--primary);
+            margin-bottom: 1vh;
+        }
+
+        .card-desc {
+            font-size: 1.2vw;
+            color: #4B5563;
+        }
+
+        /* SPECIAL ELEMENTS */
+        .cloud-illustration {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3vw;
+            margin-top: 5vh;
+            background: white;
+            padding: 3vh;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .sync-arrow {
+            font-size: 3vw;
+            color: var(--secondary);
+            animation: pulse 2s infinite;
+        }
+
+        .highlight-box {
+            background-color: #FEF3C7;
+            border-left: 6px solid var(--accent);
+            padding: 2vh 2vw;
+            font-size: 1.4vw;
+            border-radius: 0 10px 10px 0;
+            margin: 3vh 0;
+        }
+
+        /* GRADING SPREADSHEET MOCKUP */
+        .spreadsheet-mock {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 3vh;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-size: 1.2vw;
+        }
+        
+        .spreadsheet-mock th {
+            background-color: #0F9D58; /* Color de Google Sheets */
+            color: white;
+            padding: 1.5vh;
+            border: 1px solid #ddd;
+        }
+
+        .spreadsheet-mock td {
+            padding: 1.5vh;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .weight-pill {
+            display: inline-block;
+            background: #fff;
+            color: #0F9D58;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 1vw;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo-container">
+            <img src="https://i.imgur.com/Myr01oE.png" alt="UNEFCO y Ministerio de Educación" title="Ministerio de Educación - UNEFCO">
+            <img src="https://i.imgur.com/tjEpyEW.jpeg" alt="Colegio Fielding" title="Colegio Fielding">
+        </div>
+        <h1>Ofimática Básica para la Gestión Educativa</h1>
+        <div class="logo-container">
+            <img src="https://i.imgur.com/u0YqeId.png" alt="Teacher Ivan" title="Teacher Ivan">
+        </div>
+    </header>
+
+    <!-- MAIN APP LAYOUT -->
+    <div class="main-container">
+        
+        <!-- SIDEBAR NAVIGATION -->
+        <nav class="sidebar">
+            <button class="tab-btn active" onclick="openTab(event, 'tab1')">
+                ⏱️ 1. Introducción
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'tab2')">
+                ☁️ 2. Google Drive y Cuentas
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'tab3')">
+                🔄 3. Sincronización
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'tab4')">
+                📝 4. Google Docs
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'tab5')">
+                📊 5. Google Sheets
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'tab6')">
+                📋 6. Google Forms
+            </button>
+        </nav>
+
+        <!-- CONTENT AREA -->
+        <main class="content-area">
+
+            <!-- TAB 1: Introduccion -->
+            <div id="tab1" class="tab-content active">
+                <h2 class="slide-title">¡Bienvenidos Maestros y Maestras!</h2>
+                <p class="slide-text">Hoy daremos el primer paso para simplificar nuestro trabajo administrativo y enfocar nuestra energía en lo que más importa: <strong>nuestros estudiantes</strong>.</p>
+                
+                <div class="highlight-box">
+                    <strong>💡 Objetivo de Hoy (Día 1):</strong> Perder el miedo a la tecnología, comprender qué es "La Nube" y dominar las herramientas básicas para crear nuestro Cuaderno Pedagógico Digital.
+                </div>
+
+                <div class="cards-container">
+                    <div class="card">
+                        <span class="card-icon">8:30</span>
+                        <h3 class="card-title">Apertura</h3>
+                        <p class="card-desc">Nos conocemos y preparamos el equipo.</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">9:00</span>
+                        <h3 class="card-title">La Nube</h3>
+                        <p class="card-desc">Cuentas, Drive y cómo no perder nunca un archivo.</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">10:15</span>
+                        <h3 class="card-title">Documentos</h3>
+                        <p class="card-desc">Reemplazamos Word. Hojas de cálculo y formularios.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: Drive y Cuentas -->
+            <div id="tab2" class="tab-content">
+                <h2 class="slide-title">Cuentas en Google y Manejo del Drive</h2>
+                <p class="slide-text">El "Drive" es su mochila digital. Todo lo que guarden ahí, nunca se perderá, incluso si su computadora se arruina o si pierden su flash memory.</p>
+                
+                <div class="cloud-illustration">
+                    <div style="text-align: center;">
+                        <span style="font-size: 5vw;">💻</span>
+                        <p>Su Computadora</p>
+                    </div>
+                    <span class="sync-arrow">➡️</span>
+                    <div style="text-align: center; background: #E0F2FE; padding: 20px; border-radius: 50%;">
+                        <span style="font-size: 6vw;">☁️</span>
+                        <p><strong>Google Drive</strong><br>(15 GB Gratis)</p>
+                    </div>
+                    <span class="sync-arrow">➡️</span>
+                    <div style="text-align: center;">
+                        <span style="font-size: 5vw;">📱</span>
+                        <p>Su Celular</p>
+                    </div>
+                </div>
+
+                <div class="highlight-box" style="margin-top: 4vh;">
+                    <strong>Pasos Prácticos:</strong><br>
+                    1. Iniciar sesión con nuestro correo de Gmail.<br>
+                    2. Entrar a <i>drive.google.com</i><br>
+                    3. Crear una carpeta llamada: <strong>"Gestión 2026 - Mi Materia"</strong>
+                </div>
+            </div>
+
+            <!-- TAB 3: Sincronización -->
+            <div id="tab3" class="tab-content">
+                <h2 class="slide-title">Sincronización en Múltiples Dispositivos</h2>
+                <p class="slide-text">¿Hizo el examen en la computadora del colegio y necesita imprimirlo en casa? La sincronización resuelve esto automáticamente.</p>
+                
+                <div class="cards-container">
+                    <div class="card">
+                        <span class="card-icon">🏫</span>
+                        <h3 class="card-title">En el Colegio</h3>
+                        <p class="card-desc">Usted trabaja en su computadora, conectado a internet. El archivo se guarda solo.</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">🚌</span>
+                        <h3 class="card-title">En el Micro/Trufi</h3>
+                        <p class="card-desc">Abre la app de Google Docs en su celular y puede leer o corregir el mismo archivo.</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">🏠</span>
+                        <h3 class="card-title">En Casa</h3>
+                        <p class="card-desc">Abre su laptop personal, y el archivo actualizado ya está ahí listo para imprimir.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: Google Docs -->
+            <div id="tab4" class="tab-content">
+                <h2 class="slide-title">Google Docs: Creación y Edición en la Nube</h2>
+                <p class="slide-text">Es el equivalente a Microsoft Word, pero vive en internet. Es perfecto para redactar nuestros <strong>Planes de Desarrollo Curricular (PDC)</strong>, evaluaciones y comunicados.</p>
+                
+                <ul style="font-size: 1.6vw; line-height: 2; margin-left: 3vw; margin-top: 3vh;">
+                    <li>✅ <strong>Guardado Automático:</strong> Olvídese de hacer clic en "Guardar". Cada letra que escribe se guarda al instante.</li>
+                    <li>✅ <strong>Historial de Versiones:</strong> ¿Borró algo por error ayer? Puede retroceder en el tiempo y recuperarlo.</li>
+                    <li>✅ <strong>Trabajo Colaborativo:</strong> Dos profesores pueden escribir en el mismo documento al mismo tiempo desde computadoras distintas.</li>
+                    <li>✅ <strong>Voz a texto:</strong> Puede dictarle a la computadora y ella escribirá por usted.</li>
+                </ul>
+            </div>
+
+            <!-- TAB 5: Google Sheets -->
+            <div id="tab5" class="tab-content">
+                <h2 class="slide-title">Google Sheets: Nuestro Cuaderno Pedagógico</h2>
+                <p class="slide-text">El equivalente a Excel. Aquí construiremos el registro que automatizará nuestro cálculo de notas. Ya no necesitaremos calculadoras manuales a fin de trimestre.</p>
+                
+                <div class="highlight-box">
+                    <strong>📝 Estructura de Evaluación (Ejemplo Práctico para el Taller):</strong><br>
+                    Aprenderemos a sumar automáticamente respetando las dimensiones sin la casilla de decidir.
+                </div>
+
+                <table class="spreadsheet-mock">
+                    <thead>
+                        <tr>
+                            <th>N°</th>
+                            <th>Apellidos y Nombres</th>
+                            <th>SABER<br><span class="weight-pill">45 pts</span></th>
+                            <th>HACER<br><span class="weight-pill">40 pts</span></th>
+                            <th>SER<br><span class="weight-pill">10 pts</span></th>
+                            <th>AUTO EVAL.<br><span class="weight-pill">5 pts</span></th>
+                            <th>NOTA FINAL<br><span class="weight-pill">100 pts</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td style="text-align: left;">Pérez, María</td>
+                            <td>40</td>
+                            <td>38</td>
+                            <td>10</td>
+                            <td>5</td>
+                            <td style="background-color: #d4edda; font-weight: bold;">93</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td style="text-align: left;">Mamani, Carlos</td>
+                            <td>35</td>
+                            <td>30</td>
+                            <td>8</td>
+                            <td>4</td>
+                            <td style="background-color: #fff3cd; font-weight: bold;">77</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="text-align: center; margin-top: 1vh; font-style: italic; color: #666;">Ejemplo visual de cómo quedará nuestro registro final.</p>
+            </div>
+
+            <!-- TAB 6: Google Forms -->
+            <div id="tab6" class="tab-content">
+                <h2 class="slide-title">Google Forms y Cierre</h2>
+                <p class="slide-text">Los formularios son la herramienta perfecta para recolectar información rápidamente sin usar papel.</p>
+                
+                <div class="cards-container">
+                    <div class="card">
+                        <span class="card-icon">🙋🏽‍♂️</span>
+                        <h3 class="card-title">Asistencia Digital</h3>
+                        <p class="card-desc">Los estudiantes marcan su asistencia desde un celular, y los datos van directo a su Google Sheets.</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">📝</span>
+                        <h3 class="card-title">Exámenes Autocalificables</h3>
+                        <p class="card-desc">Cree un examen de opción múltiple. ¡El sistema lo califica por usted al instante!</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">📋</span>
+                        <h3 class="card-title">Diagnóstico</h3>
+                        <p class="card-desc">Encuestas a padres de familia a principio de año para conocer la situación del estudiante.</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 5vh; text-align: center;">
+                    <h3 style="color: var(--primary); font-size: 2vw;">¡Felicidades por completar la teoría del Día 1!</h3>
+                    <p style="font-size: 1.2vw; margin-top: 1vh;">Mañana construiremos esto con nuestras propias manos.</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- JAVASCRIPT FOR INTERACTIVITY -->
+    <script>
+        function openTab(evt, tabId) {
+            // Ocultar todos los contenidos
+            var tabContents = document.getElementsByClassName("tab-content");
+            for (var i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+
+            // Quitar clase "active" de todos los botones
+            var tabBtns = document.getElementsByClassName("tab-btn");
+            for (var i = 0; i < tabBtns.length; i++) {
+                tabBtns[i].classList.remove("active");
+            }
+
+            // Mostrar el tab actual y añadir clase "active" al botón clickeado
+            document.getElementById(tabId).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+</body>
+</html>
