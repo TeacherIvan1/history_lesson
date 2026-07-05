@@ -72,6 +72,7 @@
 
     <main class="flex-grow flex items-center justify-center p-4">
         
+        <!-- LOGIN SCREEN -->
         <div id="login-screen" class="screen active max-w-md w-full bg-white rounded-2xl shadow-xl p-8 border border-[#C8CDD2]">
             <h2 class="text-2xl font-bold mb-2 text-center text-[#0A468C]">Registro Diario</h2>
             <p class="text-center text-sm text-gray-500 mb-6">Ingresa tu código de estudiante para acceder a las preguntas de hoy.</p>
@@ -85,34 +86,76 @@
             <p id="error-msg" class="text-center"></p>
         </div>
 
+        <!-- MENU & LEADERBOARD SCREEN -->
+        <div id="menu-screen" class="screen max-w-2xl w-full bg-white rounded-2xl shadow-xl p-6 md:p-8 border border-[#C8CDD2]">
+            <div class="text-center mb-6">
+                <!-- Imagen Histórica (Tiwanaku - Dominio Público) -->
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Tiwanaku_Gate_of_the_Sun.jpg/800px-Tiwanaku_Gate_of_the_Sun.jpg" alt="Historia" class="w-full h-48 md:h-64 object-cover rounded-xl mb-4 shadow-md border-2 border-[#0A468C]">
+                
+                <h2 class="text-3xl font-bold text-[#0A468C]">Bienvenido, <span id="menu-student-name"></span></h2>
+                <p class="text-xl text-[#F56E1E] font-bold mt-2">Tus Estrellas: <span id="menu-student-stars">0</span> ⭐</p>
+            </div>
+            
+            <button onclick="startQuiz()" class="w-full bg-[#0A468C] hover:bg-blue-800 text-white font-bold py-4 rounded-xl shadow-lg transition text-lg mb-8 uppercase tracking-wide">
+                Jugar Quiz de Hoy
+            </button>
+
+            <!-- Leaderboard -->
+            <div class="bg-gray-50 rounded-xl p-6 border-2 border-[#96C8E6]">
+                <h3 class="text-xl font-bold text-[#0A468C] mb-4 flex items-center justify-center gap-2 uppercase">
+                    <span class="material-icons-round">leaderboard</span> Top Estudiantes
+                </h3>
+                <ul id="leaderboard-list" class="space-y-3">
+                    <!-- El Leaderboard se inyecta desde JS -->
+                </ul>
+            </div>
+        </div>
+
+        <!-- QUIZ SCREEN -->
         <div id="quiz-screen" class="screen max-w-3xl w-full bg-white rounded-2xl shadow-xl p-6 md:p-10 border border-[#C8CDD2]">
             <div class="flex justify-between items-center mb-6 border-b pb-4">
                 <div>
                     <h2 class="text-2xl font-bold text-[#0A468C]" id="student-name">Hola, Estudiante</h2>
                     <p class="text-sm font-semibold text-[#F56E1E]" id="student-course">Curso</p>
                 </div>
-                <div class="bg-[#96C8E6] text-[#0A468C] px-4 py-2 rounded-lg font-bold">
-                    Día: <span id="current-day">0</span> de Julio
+                <div class="flex flex-col items-end gap-2">
+                    <div class="bg-[#96C8E6] text-[#0A468C] px-4 py-1 rounded-lg font-bold text-sm">
+                        Día: <span id="current-day">0</span> de Julio
+                    </div>
+                    <!-- Contador de Intentos -->
+                    <div class="bg-[#ef4444] text-white px-4 py-1 rounded-lg font-bold text-sm flex items-center gap-1 shadow-sm">
+                        <span class="material-icons-round text-sm">favorite</span> Intentos: <span id="attempts-left">3</span>
+                    </div>
                 </div>
             </div>
 
             <div id="quiz-container" class="space-y-8">
-                </div>
+                <!-- Preguntas inyectadas por JS -->
+            </div>
 
             <div class="mt-8 pt-6 border-t border-gray-200">
                 <button onclick="submitQuiz()" id="btn-submit" class="w-full bg-[#0A468C] hover:bg-blue-800 text-white font-bold py-4 rounded-xl shadow-lg transition text-lg">
-                    Verificar y Registrar Asistencia
+                    Verificar Respuestas
                 </button>
                 <div id="quiz-loader" class="loader" style="display: none;"></div>
                 <p id="quiz-error" class="text-center mt-4 text-[#ef4444] font-bold hidden"></p>
             </div>
         </div>
 
+        <!-- SUCCESS SCREEN -->
         <div id="success-screen" class="screen max-w-md w-full bg-white rounded-2xl shadow-xl p-10 text-center border border-[#C8CDD2]">
-            <span class="material-icons-round text-6xl text-green-500 mb-4 block">check_circle</span>
-            <h2 class="text-3xl font-bold mb-2 text-[#0A468C]">¡Excelente!</h2>
-            <p class="text-gray-600 font-semibold mb-6">Tus respuestas son correctas. Tu asistencia ha sido registrada exitosamente por hoy.</p>
-            <p class="text-sm text-gray-400">Puedes cerrar esta ventana. Nos vemos mañana.</p>
+            <span class="material-icons-round text-6xl text-green-500 mb-4 block">star</span>
+            <h2 class="text-3xl font-bold mb-2 text-[#0A468C]">¡Misión Cumplida!</h2>
+            <p class="text-gray-600 font-semibold mb-6">Tus respuestas son correctas. Has ganado <span class="font-bold text-[#F56E1E]">1 Estrella ⭐</span> y tu asistencia de hoy está registrada.</p>
+            <p class="text-sm text-gray-400">Vuelve mañana para seguir sumando estrellas.</p>
+        </div>
+
+        <!-- FAIL SCREEN -->
+        <div id="fail-screen" class="screen max-w-md w-full bg-white rounded-2xl shadow-xl p-10 text-center border border-[#C8CDD2]">
+            <span class="material-icons-round text-6xl text-[#ef4444] mb-4 block">cancel</span>
+            <h2 class="text-3xl font-bold mb-2 text-[#0A468C]">Intentos Agotados</h2>
+            <p class="text-gray-600 font-semibold mb-6">Has fallado tus 3 intentos de hoy. Has perdido la oportunidad de ganar la estrella diaria.</p>
+            <p class="text-sm text-gray-400">Repasa tus apuntes y vuelve a intentarlo mañana.</p>
         </div>
 
     </main>
@@ -505,15 +548,17 @@
         document.getElementById(screenId).classList.add('active');
     }
 
+    let attempts = 3;
+    let storageKey = "";
+
     async function login() {
         const codigo = document.getElementById('codigo-input').value.trim();
         const errorMsg = document.getElementById('error-msg');
         const btn = document.getElementById('btn-login');
         const loader = document.getElementById('login-loader');
 
-        // Validar Fechas (El juego solo funciona del 6 al 31 de Julio)
         const hoy = new Date();
-        const mesActual = hoy.getMonth() + 1; // Enero es 0, Julio es 7
+        const mesActual = hoy.getMonth() + 1; 
         const diaActual = hoy.getDate();
         
         if (mesActual !== 7 || diaActual < 6 || diaActual > 31) {
@@ -542,9 +587,53 @@
             const data = await response.json();
 
             if (data.success) {
-                currentStudent = { codigo: codigo, nombre: data.estudiante, curso: data.curso };
-                setupQuiz();
-                switchScreen('quiz-screen');
+                // Configuramos los datos asumiendo que Apps Script ahora devuelve estrellas y leaderboard
+                currentStudent = { 
+                    codigo: codigo, 
+                    nombre: data.estudiante, 
+                    curso: data.curso,
+                    estrellas: data.estrellas || 0 
+                };
+
+                // Verificar intentos en localStorage para evitar trampas con F5
+                storageKey = `intentos_${codigo}_${hoy.getFullYear()}-${mesActual}-${diaActual}`;
+                let guardados = localStorage.getItem(storageKey);
+                
+                if (guardados === null) {
+                    attempts = 3;
+                    localStorage.setItem(storageKey, attempts);
+                } else {
+                    attempts = parseInt(guardados);
+                }
+
+                // Si ya no le quedan intentos, lo mandamos a la pantalla de fallo directamente
+                if (attempts <= 0) {
+                    switchScreen('fail-screen');
+                    return;
+                }
+
+                // Cargar datos en el menú
+                document.getElementById('menu-student-name').innerText = currentStudent.nombre;
+                document.getElementById('menu-student-stars').innerText = currentStudent.estrellas;
+                
+                const leaderList = document.getElementById('leaderboard-list');
+                leaderList.innerHTML = "";
+                
+                if (data.leaderboard && data.leaderboard.length > 0) {
+                    data.leaderboard.forEach((est, idx) => {
+                        let medalla = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : '⭐';
+                        leaderList.innerHTML += `
+                        <li class="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm border border-gray-200">
+                            <span class="font-bold text-[#0A468C]">${medalla} ${est.nombre}</span>
+                            <span class="font-bold text-[#F56E1E]">${est.estrellas} pts</span>
+                        </li>`;
+                    });
+                } else {
+                    leaderList.innerHTML = `<p class="text-center text-gray-500 italic">El tablero se actualizará pronto.</p>`;
+                }
+
+                switchScreen('menu-screen');
+
             } else {
                 errorMsg.innerText = data.message;
                 errorMsg.style.display = "block";
@@ -553,6 +642,82 @@
         } catch (err) {
             errorMsg.innerText = "Error de conexión. Intenta nuevamente.";
             errorMsg.style.display = "block";
+            btn.style.display = "block";
+        } finally {
+            loader.style.display = "none";
+        }
+    }
+
+    function startQuiz() {
+        document.getElementById('attempts-left').innerText = attempts;
+        setupQuiz();
+        switchScreen('quiz-screen');
+    }
+
+    async function submitQuiz() {
+        const errorMsg = document.getElementById('quiz-error');
+        errorMsg.classList.add('hidden');
+
+        for (let i = 0; i < dailyQuestions.length; i++) {
+            if (dailyQuestions[i].userAnswer === undefined) {
+                errorMsg.innerText = "Por favor, analiza y responde todas las preguntas antes de continuar.";
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+        }
+
+        // Verificar respuestas
+        let score = 0;
+        dailyQuestions.forEach(q => { if (q.userAnswer === q.correctShuffledIndex) score++; });
+
+        // Lógica de fallos y pérdida de intentos
+        if (score < 3) {
+            attempts--;
+            localStorage.setItem(storageKey, attempts); // Guardamos el nuevo valor para evitar trampas
+            document.getElementById('attempts-left').innerText = attempts;
+
+            if (attempts <= 0) {
+                switchScreen('fail-screen');
+            } else {
+                errorMsg.innerText = `Incorrecto (Acertaste ${score} de 3). Te quedan ${attempts} intento(s). Corrige y vuelve a intentar.`;
+                errorMsg.classList.remove('hidden');
+            }
+            return;
+        }
+
+        // Si acierta 3 de 3, procedemos a registrar
+        const btn = document.getElementById('btn-submit');
+        const loader = document.getElementById('quiz-loader');
+        
+        btn.style.display = "none";
+        loader.style.display = "block";
+
+        try {
+            const response = await fetch(APPS_SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({ 
+                    action: "register", 
+                    codigo: currentStudent.codigo,
+                    nombre: currentStudent.nombre,
+                    curso: currentStudent.curso
+                }),
+                headers: { "Content-Type": "text/plain;charset=utf-8" }
+            });
+            
+            const data = await response.json();
+
+            if (data.success) {
+                // Actualizar estrellas visualmente y mostrar pantalla de éxito
+                currentStudent.estrellas++;
+                switchScreen('success-screen');
+            } else {
+                errorMsg.innerText = data.message;
+                errorMsg.classList.remove('hidden');
+                btn.style.display = "block";
+            }
+        } catch (err) {
+            errorMsg.innerText = "Error registrando asistencia. Revisa tu conexión de internet.";
+            errorMsg.classList.remove('hidden');
             btn.style.display = "block";
         } finally {
             loader.style.display = "none";
