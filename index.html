@@ -558,11 +558,18 @@
         const loader = document.getElementById('login-loader');
 
         const hoy = new Date();
-        const mesActual = hoy.getMonth() + 1; 
+        const mesActual = hoy.getMonth() + 1; // Enero es 0, Julio es 7
         const diaActual = hoy.getDate();
         
-        if (mesActual !== 7 || diaActual < 6 || diaActual > 31) {
-            errorMsg.innerText = "Las Vacaciones de Invierno y este juego están habilitados únicamente del 6 al 31 de Julio.";
+        // Validar Fechas (Solo bloquea si MODO_PRUEBA es falso)
+        if (!MODO_PRUEBA && (mesActual !== 7 || diaActual < 3 || diaActual > 31)) {
+            errorMsg.innerText = "Las Vacaciones de Invierno y este juego están habilitados únicamente del 3 al 31 de Julio.";
+            errorMsg.style.display = "block";
+            return;
+        }
+
+        if (!codigo) {
+            errorMsg.innerText = "Por favor ingresa tu código.";
             errorMsg.style.display = "block";
             return;
         }
@@ -735,20 +742,27 @@
         document.getElementById('student-course').innerText = currentStudent.curso;
         
         const hoy = new Date();
-        const dia = hoy.getDate();
-        document.getElementById('current-day').innerText = dia;
+        let dia = hoy.getDate();
+
+        // Si estamos en Modo Prueba y fuera de fecha, forzamos el "Día 3" para simular el inicio
+        if (MODO_PRUEBA && (hoy.getMonth() + 1 !== 7 || dia < 3 || dia > 31)) {
+            dia = 3; 
+            document.getElementById('current-day').innerText = "TEST (Día 3)";
+        } else {
+            document.getElementById('current-day').innerText = dia;
+        }
 
         let cursoData = currentStudent.curso.includes("1ro") ? "1ro Sec" : 
                         currentStudent.curso.includes("2do") ? "2do Sec" :
-                        currentStudent.curso.includes("3ro") ? "3ro Sec" : "1ro Sec"; 
+                        currentStudent.curso.includes("3ro") ? "3ro Sec" : "4to Sec"; 
         
         let bank = questionBank[cursoData];
-        if (!bank || bank.length < 3) bank = questionBank["1ro Sec"]; // Fallback si no hay preguntas suficientes
+        if (!bank || bank.length < 3) bank = questionBank["1ro Sec"]; 
 
-        // LÓGICA DE AZAR CON SEMILLA (Impide que los alumnos actualicen para cambiar la pregunta)
-        let seed = dia; // Base de la semilla: el día del mes
+        // LÓGICA DE AZAR CON SEMILLA
+        let seed = dia; 
         for (let i = 0; i < currentStudent.codigo.length; i++) {
-            seed += currentStudent.codigo.charCodeAt(i); // Suma los caracteres del código del alumno
+            seed += currentStudent.codigo.charCodeAt(i); 
         }
 
         // Clonar y mezclar el banco de preguntas usando la semilla
