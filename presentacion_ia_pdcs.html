@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automatización de PDCs con IA - Colegio Fielding</title>
+    <style>
+        :root {
+            --primary: #4F46E5; /* Indigo para IA/Tecnología */
+            --secondary: #6366F1; /* Indigo claro */
+            --accent: #F59E0B; /* Naranja para resaltar */
+            --success: #10B981; /* Verde éxito */
+            --danger: #EF4444; /* Rojo alertas */
+            --bg-light: #F8FAFC;
+            --text-dark: #1E293B;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; 
+        }
+
+        /* HEADER & LOGOS */
+        header {
+            background-color: var(--white);
+            height: 12vh;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 3vw;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-container img {
+            max-height: 8vh;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-container img:hover {
+            transform: scale(1.05);
+        }
+
+        h1 {
+            font-size: 1.8vw;
+            color: var(--primary);
+            text-align: center;
+            flex-grow: 1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 800;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            height: 88vh;
+            width: 100vw;
+        }
+
+        /* SIDEBAR / TABS */
+        .sidebar {
+            width: 25vw;
+            background-color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            padding: 2vh 0;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            z-index: 5;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--white);
+            padding: 2.5vh 2vw;
+            text-align: left;
+            font-size: 1.3vw;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            opacity: 0.8;
+            border-left: 5px solid transparent;
+        }
+
+        .tab-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            opacity: 1;
+        }
+
+        .tab-btn.active {
+            background-color: var(--secondary);
+            opacity: 1;
+            border-left: 5px solid var(--accent);
+            font-weight: bold;
+        }
+
+        /* CONTENT AREA */
+        .content-area {
+            width: 75vw;
+            padding: 4vh 4vw;
+            position: relative;
+            background-image: radial-gradient(circle at top right, #e0e7ff, transparent);
+            overflow-y: auto;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease forwards;
+            height: 100%;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* SLIDE ELEMENTS */
+        .slide-title {
+            font-size: 2.8vw;
+            color: var(--primary);
+            margin-bottom: 2vh;
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        .slide-text {
+            font-size: 1.4vw;
+            line-height: 1.6;
+            margin-bottom: 2vh;
+        }
+
+        /* INTERACTIVE CARDS */
+        .cards-container {
+            display: flex;
+            gap: 2vw;
+            margin-top: 3vh;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 3vh 2vw;
+            flex: 1;
+            min-width: 20vw;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            border-color: var(--secondary);
+        }
+
+        .card-icon {
+            font-size: 3.5vw;
+            margin-bottom: 1.5vh;
+            display: block;
+            animation: float 4s infinite ease-in-out;
+        }
+
+        .card-title {
+            font-size: 1.6vw;
+            color: var(--primary);
+            margin-bottom: 1vh;
+            font-weight: bold;
+        }
+
+        /* PROMPT BOX */
+        .prompt-box {
+            background-color: #EFF6FF;
+            border-left: 6px solid #3B82F6;
+            padding: 2.5vh 2vw;
+            font-size: 1.3vw;
+            font-style: italic;
+            border-radius: 0 12px 12px 0;
+            margin: 2vh 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            line-height: 1.6;
+        }
+
+        /* CODE BOX */
+        .code-box {
+            background-color: #1E1E1E;
+            color: #D4D4D4;
+            padding: 2vh 2vw;
+            border-radius: 10px;
+            font-family: 'Consolas', monospace;
+            font-size: 1.1vw;
+            overflow-x: auto;
+            white-space: pre;
+            line-height: 1.5;
+            border-left: 5px solid var(--success);
+            margin-top: 2vh;
+        }
+        
+        .code-keyword { color: #569CD6; }
+        .code-string { color: #CE9178; }
+        .code-comment { color: #6A9955; font-style: italic; }
+
+        /* SPREADSHEET MOCKUP */
+        .spreadsheet-mock {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 3vh;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-size: 1.1vw;
+        }
+        
+        .spreadsheet-mock th {
+            background-color: var(--success);
+            color: white;
+            padding: 1.2vh;
+            border: 1px solid #ddd;
+            text-align: center;
+            font-family: monospace;
+        }
+
+        .spreadsheet-mock td {
+            padding: 1vh;
+            border: 1px solid #ddd;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .highlight-box {
+            background-color: #FEF3C7;
+            border-left: 6px solid var(--accent);
+            padding: 2vh 2vw;
+            font-size: 1.4vw;
+            border-radius: 0 10px 10px 0;
+            margin: 3vh 0;
+        }
+
+        .prompt-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5vh;
+            margin-top: 3vh;
+        }
+
+        .pb-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 1.5vh 2vw;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--secondary);
+        }
+
+        .pb-label {
+            font-weight: bold;
+            color: var(--primary);
+            width: 20%;
+            font-size: 1.2vw;
+        }
+
+        .pb-desc {
+            width: 80%;
+            font-size: 1.2vw;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo-container">
+            <img src="https://i.imgur.com/Myr01oE.png" alt="UNEFCO" title="UNEFCO">
+            <img src="https://i.imgur.com/tjEpyEW.jpeg" alt="Colegio Fielding" title="Colegio Fielding">
+        </div>
+        <h1>Automatización de PDCs con IA</h1>
+        <div class="logo-container">
+            <img src="https://i.imgur.com/u0YqeId.png" alt="Teacher Ivan" title="Teacher Ivan">
+        </div>
+    </header>
+
+    <!-- MAIN APP LAYOUT -->
+    <div class="main-container">
+        
+        <!-- SIDEBAR NAVIGATION -->
+        <nav class="sidebar">
+            <button class="tab-btn active" onclick="openTab(event, 'tab1')">
+                🏗️ 1. Arquitectura y Matriz
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'tab2')">
+                🤖 2. Ingeniería de Prompts
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'tab3')">
+                💻 3. Motor Apps Script
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'tab4')">
+                🚀 4. Ejecución y Permisos
+            </button>
+        </nav>
+
+        <!-- CONTENT AREA -->
+        <main class="content-area">
+
+            <!-- TAB 1: Matriz -->
+            <div id="tab1" class="tab-content active">
+                <h2 class="slide-title">1. Estructuración de la Matriz de Datos</h2>
+                <p class="slide-text">El primer paso es crear nuestra Base de Datos en <strong>Google Sheets</strong>. Cada columna representa una variable de nuestro PDC. Para que el código funcione, los nombres deben escribirse <strong>estrictamente en minúsculas y sin espacios</strong>[cite: 11].</p>
+                
+                <h3 style="color: var(--primary); font-size: 1.5vw; margin-top: 3vh;">Cabecera Obligatoria del Sistema:</h3>
+                
+                <div style="overflow-x: auto;">
+                    <table class="spreadsheet-mock">
+                        <thead>
+                            <tr>
+                                <th>materia</th>
+                                <th>nro_pdc</th>
+                                <th>distrito</th>
+                                <th>maestro</th>
+                                <th>nivel</th>
+                                <th>asignatura</th>
+                                <th>unidad_educativa</th>
+                                <th>mes</th>
+                                <th>director</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Texto</td>
+                                <td>Número</td>
+                                <td>Texto</td>
+                                <td>Texto</td>
+                                <td>Texto</td>
+                                <td>Texto</td>
+                                <td>Texto</td>
+                                <td>Texto</td>
+                                <td>Texto</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>➡️ Columnas Curriculares Adicionales:</strong><br>
+                    Debemos continuar hacia la derecha agregando: <em>anio_escolaridad, perfiles_salida, objetivo_holistico, contenidos, practica, teoria, valoracion, produccion, materiales_vida, materiales_analogicos, ser, saber, hacer, adaptacion_curricular, producto, competencia, fecha_emision</em>[cite: 11].
+                </div>
+            </div>
+
+            <!-- TAB 2: PROMPT ENGINEERING (Especial Enfoque) -->
+            <div id="tab2" class="tab-content">
+                <h2 class="slide-title">2. Copiloto de Contenidos: Ingeniería de Prompts</h2>
+                <p class="slide-text">Para rellenar masivamente los meses de Julio a Noviembre, usaremos IA. El secreto del éxito no es "hablarle" a la IA, sino darle un <strong>prompt restrictivo y técnico</strong>[cite: 11].</p>
+                
+                <div class="prompt-box">
+                    "Actúa como un diseñador curricular experto en el Subsistema de Educación Regular de Bolivia. Necesito redactar los campos para mi Spreadsheet de planificación de la asignatura de [Insertar Materia] para [Insertar Año de Escolaridad] correspondiente al mes de [Insertar Mes]. Dame el contenido estructurado en un bloque de texto separado por tabulaciones para copiar y pegar directamente, incluyendo: objetivos holísticos con las cuatro dimensiones, contenidos curriculares oficiales vigentes, orientaciones metodológicas detalladas (Práctica, Teoría, Valoración, Producción) y criterios de evaluación (Ser, Saber, Hacer)."[cite: 11]
+                </div>
+
+                <h3 style="color: var(--primary); font-size: 1.8vw; margin-top: 3vh;">Anatomía del Prompt (¿Por qué funciona?)</h3>
+                
+                <div class="prompt-breakdown">
+                    <div class="pb-item">
+                        <div class="pb-label">🎭 1. El Rol</div>
+                        <div class="pb-desc"><em>"Actúa como diseñador curricular experto..."</em> Obliga a la IA a usar lenguaje técnico pedagógico boliviano, evitando respuestas genéricas.</div>
+                    </div>
+                    <div class="pb-item">
+                        <div class="pb-label">🎯 2. La Tarea</div>
+                        <div class="pb-desc"><em>"Necesito redactar los campos para mi Spreadsheet..."</em> Le da contexto de que los datos irán a una tabla, no a un documento de texto libre.</div>
+                    </div>
+                    <div class="pb-item">
+                        <div class="pb-label">📋 3. El Formato</div>
+                        <div class="pb-desc"><em>"Separado por tabulaciones para copiar y pegar..."</em> Esto es vital. La tabulación permite que al pegar en Excel, cada dato caiga exactamente en su propia columna.</div>
+                    </div>
+                    <div class="pb-item" style="border-left-color: var(--accent);">
+                        <div class="pb-label">⚙️ 4. Restricciones</div>
+                        <div class="pb-desc"><em>"Criterios de evaluación (Ser, Saber, Hacer)..."</em> <strong>Nota para el Colegio Fielding:</strong> Recuerden instruir a la IA que el Saber vale 45 pts, Hacer 40 pts, Ser 10 pts y Autoevaluación 5 pts, <strong>omitiendo la dimensión del Decidir</strong> para alinear los PDCs con nuestro nuevo cuaderno pedagógico institucional.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: Apps Script -->
+            <div id="tab3" class="tab-content">
+                <h2 class="slide-title">3. Configuración del Motor Apps Script</h2>
+                <p class="slide-text">Este código es el motor de nuestra fábrica. Lo insertaremos yendo al menú <strong>Extensiones -> Apps Script</strong> en nuestra hoja de cálculo[cite: 11].</p>
+                
+                <div class="code-box">
+<span class="code-keyword">function</span> generarPDCsMasivos() {
+  <span class="code-keyword">var</span> sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  <span class="code-keyword">var</span> data = sheet.getDataRange().getValues();
+  <span class="code-keyword">var</span> headers = data[0];
+  
+  <span class="code-comment">// Bucle para recorrer cada fila de docente (A partir de la fila 2)[cite: 11]</span>
+  <span class="code-keyword">for</span> (<span class="code-keyword">var</span> i = 1; i < data.length; i++) {
+    <span class="code-keyword">var</span> row = data[i];
+    <span class="code-keyword">var</span> nombreArchivo = <span class="code-string">"PDC_"</span> + row[7] + <span class="code-string">"_"</span> + row[0]; <span class="code-comment">// PDC_Mes_Materia[cite: 11]</span>
+    <span class="code-keyword">var</span> doc = DocumentApp.create(nombreArchivo);
+    <span class="code-keyword">var</span> body = doc.getBody();
+    
+    body.appendParagraph(<span class="code-string">"PLAN DE DESARROLLO CURRICULAR (PDC)"</span>).setHeading(DocumentApp.ParagraphHeading.HEADING1);
+    
+    <span class="code-comment">// Mapeo automático de llaves dinámicas {{columna}}[cite: 11]</span>
+    <span class="code-keyword">for</span> (<span class="code-keyword">var</span> j = 0; j < headers.length; j++) {
+      body.appendParagraph(headers[j].toUpperCase() + <span class="code-string">": "</span> + row[j]);
+    }
+    doc.saveAndClose();
+  }
+}</div>
+
+                <div class="highlight-box">
+                    <strong>🧠 ¿Qué hace este código?</strong> Lee fila por fila. Por cada fila, crea un Documento de Google nuevo, le pone de título el Mes y la Materia (ej. "PDC_Julio_Historia"), y vacía todo el contenido de las columnas dentro del documento[cite: 11].
+                </div>
+            </div>
+
+            <!-- TAB 4: Ejecución -->
+            <div id="tab4" class="tab-content">
+                <h2 class="slide-title">4. Ejecución, Permisos y Producción Masiva</h2>
+                <p class="slide-text">Al presionar "Ejecutar" por primera vez, Google nos lanzará una alerta de seguridad porque nuestro código va a crear archivos automáticamente. Debemos autorizarlo siguiendo esta ruta exacta[cite: 11]:</p>
+                
+                <div class="cards-container">
+                    <div class="card">
+                        <span class="card-icon">1️⃣</span>
+                        <h3 class="card-title">Revisar</h3>
+                        <p class="card-desc">Haga clic en el botón emergente que dice <strong>"Revisar permisos"</strong>[cite: 11].</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">2️⃣</span>
+                        <h3 class="card-title">Cuenta</h3>
+                        <p class="card-desc">Seleccione su <strong>cuenta institucional</strong> o de Gmail activa en la lista[cite: 11].</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">3️⃣</span>
+                        <h3 class="card-title">Avanzado</h3>
+                        <p class="card-desc">Ignore la alerta roja y pulse en las letras pequeñas que dicen <strong>"Avanzado"</strong> (abajo a la izquierda)[cite: 11].</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">4️⃣</span>
+                        <h3 class="card-title">Permitir</h3>
+                        <p class="card-desc">Haga clic en <strong>"Ir a Proyecto sin título (no seguro)"</strong> y finalmente presione el botón azul <strong>"Permitir"</strong>[cite: 11].</p>
+                    </div>
+                </div>
+
+                <div class="highlight-box" style="margin-top: 5vh; border-left-color: var(--success); background-color: #ECFDF5;">
+                    <strong>🚀 RESULTADO EN LA NUBE:</strong><br>
+                    El script se ejecutará en segundo plano. Al dirigirse a su unidad de Google Drive, observará la aparición instantánea de todos sus documentos de PDC individuales listos para su impresión, descarga o envío a Dirección[cite: 11].
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- JAVASCRIPT FOR INTERACTIVITY -->
+    <script>
+        function openTab(evt, tabId) {
+            // Ocultar todos los contenidos
+            var tabContents = document.getElementsByClassName("tab-content");
+            for (var i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+
+            // Quitar clase "active" de todos los botones
+            var tabBtns = document.getElementsByClassName("tab-btn");
+            for (var i = 0; i < tabBtns.length; i++) {
+                tabBtns[i].classList.remove("active");
+            }
+
+            // Mostrar el tab actual y añadir clase "active"
+            document.getElementById(tabId).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+</body>
+</html>
