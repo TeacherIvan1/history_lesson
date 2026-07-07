@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curso 1 - Hardware y Procesamiento de Textos</title>
+    <style>
+        :root {
+            --primary: #1E3A8A; /* Azul Institucional */
+            --secondary: #3B82F6; /* Azul claro */
+            --accent: #F59E0B; /* Naranja para resaltar */
+            --success: #10B981; /* Verde éxito */
+            --bg-light: #F3F4F6;
+            --text-dark: #1F2937;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; 
+        }
+
+        /* HEADER & LOGOS */
+        header {
+            background-color: var(--white);
+            height: 12vh;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 3vw;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-container img {
+            max-height: 8vh;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-container img:hover {
+            transform: scale(1.05);
+        }
+
+        h1 {
+            font-size: 1.8vw;
+            color: var(--primary);
+            text-align: center;
+            flex-grow: 1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 800;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            height: 88vh;
+            width: 100vw;
+        }
+
+        /* SIDEBAR / TABS */
+        .sidebar {
+            width: 25vw;
+            background-color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            padding: 2vh 0;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            z-index: 5;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--white);
+            padding: 2.5vh 2vw;
+            text-align: left;
+            font-size: 1.3vw;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            opacity: 0.8;
+            border-left: 5px solid transparent;
+        }
+
+        .tab-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            opacity: 1;
+        }
+
+        .tab-btn.active {
+            background-color: var(--secondary);
+            opacity: 1;
+            border-left: 5px solid var(--accent);
+            font-weight: bold;
+        }
+
+        /* CONTENT AREA */
+        .content-area {
+            width: 75vw;
+            padding: 4vh 4vw;
+            position: relative;
+            background-image: radial-gradient(circle at top right, #e0e7ff, transparent);
+            overflow-y: auto;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease forwards;
+            height: 100%;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* SLIDE ELEMENTS */
+        .slide-title {
+            font-size: 2.8vw;
+            color: var(--primary);
+            margin-bottom: 2vh;
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        .slide-text {
+            font-size: 1.4vw;
+            line-height: 1.6;
+            margin-bottom: 2vh;
+        }
+
+        /* INTERACTIVE CARDS */
+        .cards-container {
+            display: flex;
+            gap: 2vw;
+            margin-top: 3vh;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 3vh 2vw;
+            flex: 1;
+            min-width: 20vw;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            border-color: var(--secondary);
+        }
+
+        .card-icon {
+            font-size: 3.5vw;
+            margin-bottom: 1.5vh;
+            display: block;
+            animation: float 4s infinite ease-in-out;
+        }
+
+        .card-title {
+            font-size: 1.6vw;
+            color: var(--primary);
+            margin-bottom: 1vh;
+            font-weight: bold;
+        }
+
+        /* HARDWARE FLOW ILLUSTRATION */
+        .hardware-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--white);
+            padding: 3vh 4vw;
+            border-radius: 15px;
+            margin-top: 4vh;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .flow-step {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .flow-arrow {
+            font-size: 2.5vw;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* KEYBOARD SHORTCUTS */
+        .shortcut-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2vh 2vw;
+            margin-top: 3vh;
+        }
+
+        .key-badge {
+            background: #374151;
+            color: white;
+            padding: 0.5vh 1vw;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 1.3vw;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #111827;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        /* FOLDER TREE */
+        .folder-tree {
+            background: var(--white);
+            padding: 3vh 3vw;
+            border-radius: 12px;
+            font-size: 1.5vw;
+            line-height: 2;
+            margin-top: 2vh;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--success);
+        }
+
+        .folder { color: #D97706; font-weight: bold; }
+        .file { color: var(--secondary); margin-left: 2vw; }
+        
+        .highlight-box {
+            background-color: #FEF3C7;
+            border-left: 6px solid var(--accent);
+            padding: 2vh 2vw;
+            font-size: 1.4vw;
+            border-radius: 0 10px 10px 0;
+            margin: 3vh 0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo-container">
+            <img src="https://i.imgur.com/Myr01oE.png" alt="UNEFCO" title="UNEFCO">
+            <img src="https://i.imgur.com/tjEpyEW.jpeg" alt="Colegio Fielding" title="Colegio Fielding">
+        </div>
+        <h1>Fundamentos de Hardware y Textos</h1>
+        <div class="logo-container">
+            <img src="https://i.imgur.com/u0YqeId.png" alt="Teacher Ivan" title="Teacher Ivan">
+        </div>
+    </header>
+
+    <!-- MAIN APP LAYOUT -->
+    <div class="main-container">
+        
+        <!-- SIDEBAR NAVIGATION -->
+        <nav class="sidebar">
+            <button class="tab-btn active" onclick="openTab(event, 'tab1')">
+                🖥️ 1. El Equipo Informático
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'tab2')">
+                ⌨️ 2. Dominio del Teclado
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'tab3')">
+                📁 3. Gestión de Archivos
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'tab4')">
+                📝 4. Edición en Word/Docs
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'tab5')">
+                🖨️ 5. Diseño e Impresión
+            </button>
+        </nav>
+
+        <!-- CONTENT AREA -->
+        <main class="content-area">
+
+            <!-- TAB 1: Hardware -->
+            <div id="tab1" class="tab-content active">
+                <h2 class="slide-title">Reconocimiento del Equipo Informático</h2>
+                <p class="slide-text">Entender cómo piensa la computadora nos ayuda a perderle el miedo. Funciona exactamente igual que el cerebro humano: <strong>Recibe, Procesa y Responde.</strong></p>
+                
+                <div class="hardware-flow">
+                    <div class="flow-step">
+                        <span style="font-size: 4vw;">⌨️🖱️</span>
+                        <h3 style="color:var(--primary); margin-top:1vh;">1. ENTRADA</h3>
+                        <p style="font-size:1.1vw;">Le damos órdenes<br>(Teclado y Mouse)</p>
+                    </div>
+                    <span class="flow-arrow">➔</span>
+                    <div class="flow-step">
+                        <span style="font-size: 4vw;">🧠💻</span>
+                        <h3 style="color:var(--primary); margin-top:1vh;">2. PROCESO</h3>
+                        <p style="font-size:1.1vw;">Piensa y calcula<br>(CPU / Memoria RAM)</p>
+                    </div>
+                    <span class="flow-arrow">➔</span>
+                    <div class="flow-step">
+                        <span style="font-size: 4vw;">🖥️🖨️</span>
+                        <h3 style="color:var(--primary); margin-top:1vh;">3. SALIDA</h3>
+                        <p style="font-size:1.1vw;">Nos muestra el resultado<br>(Pantalla e Impresora)</p>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>💡 Regla de Oro del Encendido y Apagado:</strong><br>
+                    Nunca desconecte el equipo de golpe. El "Cerebro" (CPU) necesita tiempo para guardar la información. Siempre use la opción <em>Inicio -> Apagar</em>.
+                </div>
+            </div>
+
+            <!-- TAB 2: Teclado -->
+            <div id="tab2" class="tab-content">
+                <h2 class="slide-title">Dominio del Teclado y Atajos</h2>
+                <p class="slide-text">El teclado es nuestra principal herramienta de comunicación. Conocer los trucos nos ahorrará horas de trabajo administrativo.</p>
+                
+                <div class="cards-container">
+                    <div class="card">
+                        <span class="card-icon">🌎</span>
+                        <h3 class="card-title">¿Latino o Americano?</h3>
+                        <p class="card-desc">Si su teclado tiene la letra <strong>Ñ</strong> visible junto a la L, es Latino. Si no la tiene, es Americano (inglés).</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">📧</span>
+                        <h3 class="card-title">¿Cómo sacar la Arroba (@)?</h3>
+                        <p class="card-desc"><strong>Teclado Latino:</strong> Presione <span class="key-badge">Alt Gr</span> + <span class="key-badge">Q</span> (o el 2).<br><strong>Teclado Americano:</strong> Presione <span class="key-badge">Shift</span> + <span class="key-badge">2</span>.</p>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 4vh; color: var(--primary); font-size: 2vw;">Atajos que salvan vidas (Sin usar el Mouse):</h3>
+                <div class="shortcut-grid">
+                    <div><span class="key-badge">Ctrl + C</span> Copiar un texto o archivo.</div>
+                    <div><span class="key-badge">Ctrl + V</span> Pegar lo que hemos copiado.</div>
+                    <div><span class="key-badge">Ctrl + Z</span> ¡Deshacer un error! (El botón mágico).</div>
+                    <div><span class="key-badge">Ctrl + G / S</span> Guardar el documento rápidamente.</div>
+                </div>
+            </div>
+
+            <!-- TAB 3: Gestión de Archivos -->
+            <div id="tab3" class="tab-content">
+                <h2 class="slide-title">Gestión y Organización de Archivos</h2>
+                <p class="slide-text">Un escritorio lleno de archivos sueltos es como una mochila desordenada. Debemos estructurar nuestra información creando <strong>Carpetas</strong>.</p>
+                
+                <p class="slide-text" style="font-weight: bold; color: var(--primary);">Ejemplo de Estructura Pedagógica Correcta:</p>
+                <div class="folder-tree">
+                    📁 <span class="folder">Gestión 2026 - Teacher Ivan</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;📁 <span class="folder">Historia Universal - 1ro Secundaria</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 <span class="file">PDC_Historia_Roma_Julio.docx</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📊 <span class="file">Registro_Notas_1ro_Secundaria.xlsx</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;📁 <span class="folder">Inglés - Nivel B1</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;📄 <span class="file">Evaluacion_Unidad2.pdf</span>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>🔍 Búsqueda Rápida:</strong> Si pierde un archivo, presione la tecla <span class="key-badge">Windows</span> y escriba el nombre (ej. "PDC Roma"). ¡La computadora lo buscará por usted!
+                </div>
+            </div>
+
+            <!-- TAB 4: Word/Docs -->
+            <div id="tab4" class="tab-content">
+                <h2 class="slide-title">Edición de Textos Pedagógicos</h2>
+                <p class="slide-text">El procesador de textos (Word o Google Docs) es nuestro lienzo para crear Planes de Clase, Evaluaciones y Guías de Aprendizaje.</p>
+                
+                <div class="cards-container">
+                    <div class="card">
+                        <span class="card-icon">🔤</span>
+                        <h3 class="card-title">Tipografía Clara</h3>
+                        <p class="card-desc">Evite letras adornadas. Use <strong>Arial</strong> o <strong>Calibri</strong>. Tamaño 14 para títulos y 11/12 para el texto normal. ¡Menos es más!</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">📑</span>
+                        <h3 class="card-title">Alineación Correcta</h3>
+                        <p class="card-desc">Use <strong>Centrado</strong> para el nombre de la Unidad Educativa y <strong>Justificado</strong> para que los párrafos de su PDC se vean rectos y profesionales.</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">📊</span>
+                        <h3 class="card-title">Tablas y Organización</h3>
+                        <p class="card-desc">Use la herramienta <em>Insertar -> Tabla</em> para estructurar el desarrollo de su clase (Práctica, Teoría, Valoración, Producción).</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: Impresión -->
+            <div id="tab5" class="tab-content">
+                <h2 class="slide-title">Diseño e Impresión Avanzada</h2>
+                <p class="slide-text">Configurar bien la impresión evita desperdiciar tinta y hojas. Antes de imprimir, siempre revise la <strong>Vista Previa</strong>.</p>
+                
+                <ul style="font-size: 1.6vw; line-height: 2; margin-left: 3vw; margin-top: 3vh;">
+                    <li>📄 <strong>Tamaño de Papel:</strong> Asegúrese de que esté configurado en <strong>A4</strong> o <strong>Carta</strong>, según la hoja que pondrá en la impresora.</li>
+                    <li>♻️ <strong>Impresión a Doble Cara:</strong> Úselo para evaluaciones largas y guías de trabajo para cuidar los recursos del colegio.</li>
+                    <li>🖼️ <strong>Impresión tipo Póster:</strong> Algunas impresoras permiten dividir una imagen grande en 4 hojas A4 para armar mapas conceptuales o afiches decorativos para el aula.</li>
+                    <li>📏 <strong>Ajuste de Escala:</strong> Si su tabla se sale un poco de la hoja, reduzca la escala al 90% en la configuración de impresión para que encaje perfectamente.</li>
+                </ul>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- JAVASCRIPT FOR INTERACTIVITY -->
+    <script>
+        function openTab(evt, tabId) {
+            // Ocultar todos los contenidos
+            var tabContents = document.getElementsByClassName("tab-content");
+            for (var i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+
+            // Quitar clase "active" de todos los botones
+            var tabBtns = document.getElementsByClassName("tab-btn");
+            for (var i = 0; i < tabBtns.length; i++) {
+                tabBtns[i].classList.remove("active");
+            }
+
+            // Mostrar el tab actual y añadir clase "active"
+            document.getElementById(tabId).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+</body>
+</html>
