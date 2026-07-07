@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curso 2 - Automatización del Cuaderno Pedagógico</title>
+    <style>
+        :root {
+            --primary: #0F9D58; /* Verde Excel/Institucional */
+            --secondary: #34A853; /* Verde claro */
+            --accent: #F59E0B; /* Naranja para resaltar */
+            --danger: #EA4335; /* Rojo para errores/alertas */
+            --bg-light: #F3F4F6;
+            --text-dark: #1F2937;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; 
+        }
+
+        /* HEADER & LOGOS */
+        header {
+            background-color: var(--white);
+            height: 12vh;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 3vw;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-container img {
+            max-height: 8vh;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-container img:hover {
+            transform: scale(1.05);
+        }
+
+        h1 {
+            font-size: 1.8vw;
+            color: var(--primary);
+            text-align: center;
+            flex-grow: 1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 800;
+        }
+
+        /* MAIN LAYOUT */
+        .main-container {
+            display: flex;
+            height: 88vh;
+            width: 100vw;
+        }
+
+        /* SIDEBAR / TABS */
+        .sidebar {
+            width: 25vw;
+            background-color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            padding: 2vh 0;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            z-index: 5;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--white);
+            padding: 2.5vh 2vw;
+            text-align: left;
+            font-size: 1.3vw;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            opacity: 0.8;
+            border-left: 5px solid transparent;
+        }
+
+        .tab-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            opacity: 1;
+        }
+
+        .tab-btn.active {
+            background-color: var(--secondary);
+            opacity: 1;
+            border-left: 5px solid var(--accent);
+            font-weight: bold;
+        }
+
+        /* CONTENT AREA */
+        .content-area {
+            width: 75vw;
+            padding: 4vh 4vw;
+            position: relative;
+            background-image: radial-gradient(circle at top right, #e6f4ea, transparent);
+            overflow-y: auto;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease forwards;
+            height: 100%;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* SLIDE ELEMENTS */
+        .slide-title {
+            font-size: 2.8vw;
+            color: var(--primary);
+            margin-bottom: 2vh;
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+
+        .slide-text {
+            font-size: 1.4vw;
+            line-height: 1.6;
+            margin-bottom: 2vh;
+        }
+
+        /* INTERACTIVE CARDS */
+        .cards-container {
+            display: flex;
+            gap: 2vw;
+            margin-top: 3vh;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 3vh 2vw;
+            flex: 1;
+            min-width: 20vw;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            border-color: var(--secondary);
+        }
+
+        .card-icon {
+            font-size: 3.5vw;
+            margin-bottom: 1.5vh;
+            display: block;
+            animation: float 4s infinite ease-in-out;
+        }
+
+        .card-title {
+            font-size: 1.6vw;
+            color: var(--primary);
+            margin-bottom: 1vh;
+            font-weight: bold;
+        }
+
+        /* SPREADSHEET MOCKUP */
+        .spreadsheet-mock {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 3vh;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-size: 1.2vw;
+        }
+        
+        .spreadsheet-mock th {
+            background-color: var(--primary);
+            color: white;
+            padding: 1.5vh;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .spreadsheet-mock td {
+            padding: 1.5vh;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .cell-header {
+            background-color: #e5e7eb;
+            color: #374151;
+            font-weight: bold;
+        }
+
+        /* KEYBOARD SHORTCUTS */
+        .key-badge {
+            background: #374151;
+            color: white;
+            padding: 0.5vh 1vw;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 1.3vw;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #111827;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .highlight-box {
+            background-color: #FEF3C7;
+            border-left: 6px solid var(--accent);
+            padding: 2vh 2vw;
+            font-size: 1.4vw;
+            border-radius: 0 10px 10px 0;
+            margin: 3vh 0;
+        }
+        
+        .alert-box {
+            background-color: #FEE2E2;
+            border-left: 6px solid var(--danger);
+            padding: 2vh 2vw;
+            font-size: 1.4vw;
+            border-radius: 0 10px 10px 0;
+            margin: 3vh 0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo-container">
+            <img src="https://i.imgur.com/Myr01oE.png" alt="UNEFCO" title="UNEFCO">
+            <img src="https://i.imgur.com/tjEpyEW.jpeg" alt="Colegio Fielding" title="Colegio Fielding">
+        </div>
+        <h1>Automatización del Cuaderno Pedagógico</h1>
+        <div class="logo-container">
+            <img src="https://i.imgur.com/u0YqeId.png" alt="Teacher Ivan" title="Teacher Ivan">
+        </div>
+    </header>
+
+    <!-- MAIN APP LAYOUT -->
+    <div class="main-container">
+        
+        <!-- SIDEBAR NAVIGATION -->
+        <nav class="sidebar">
+            <button class="tab-btn active" onclick="openTab(event, 'tab1')">
+                📊 1. Estructura Básica
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'tab2')">
+                ➕ 2. Fórmulas y Cálculos
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'tab3')">
+                📈 3. Gráficos y Análisis
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'tab4')">
+                ⚙️ 4. Funciones Avanzadas
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'tab5')">
+                🔒 5. Protección y Cierre
+            </button>
+        </nav>
+
+        <!-- CONTENT AREA -->
+        <main class="content-area">
+
+            <!-- TAB 1: Estructura -->
+            <div id="tab1" class="tab-content active">
+                <h2 class="slide-title">Reconocimiento de la Estructura</h2>
+                <p class="slide-text">Una hoja de cálculo funciona como una tabla inteligente que permite organizar información y realizar cálculos automáticos, reduciendo errores y ahorrando tiempo[cite: 9].</p>
+                
+                <div class="cards-container">
+                    <div class="card">
+                        <span class="card-icon">⬇️</span>
+                        <h3 class="card-title">Columnas</h3>
+                        <p class="card-desc">Se identifican con letras (A, B, C). Van en sentido vertical y organizan tipos de información[cite: 9].</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">➡️</span>
+                        <h3 class="card-title">Filas</h3>
+                        <p class="card-desc">Se identifican con números (1, 2, 3). Van en sentido horizontal y representan cada registro o estudiante[cite: 9].</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">🟦</span>
+                        <h3 class="card-title">Celdas</h3>
+                        <p class="card-desc">Es la intersección entre una fila y una columna (Ej: A1, B2). Es donde ingresamos datos numéricos o textuales[cite: 9].</p>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <strong>💡 La Barra de Fórmulas:</strong><br>
+                    Es el espacio superior donde podemos ver y editar los datos o fórmulas reales que contiene una celda seleccionada[cite: 9].
+                </div>
+            </div>
+
+            <!-- TAB 2: Fórmulas -->
+            <div id="tab2" class="tab-content">
+                <h2 class="slide-title">Operaciones Matemáticas Fundamentales</h2>
+                <p class="slide-text">Excel nos permite actuar como una calculadora integrada para sumar, restar y calcular porcentajes directamente en las celdas[cite: 9].</p>
+                
+                <table class="spreadsheet-mock">
+                    <thead>
+                        <tr>
+                            <th class="cell-header"></th>
+                            <th class="cell-header">A</th>
+                            <th class="cell-header">B</th>
+                            <th class="cell-header">C</th>
+                            <th class="cell-header">D</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="cell-header">1</td>
+                            <td style="font-weight:bold;">Estudiante</td>
+                            <td style="font-weight:bold;">Saber (45%)</td>
+                            <td style="font-weight:bold;">Hacer (40%)</td>
+                            <td style="font-weight:bold;">Promedio Parcial</td>
+                        </tr>
+                        <tr>
+                            <td class="cell-header">2</td>
+                            <td style="text-align: left;">Mamani, Juan</td>
+                            <td>40</td>
+                            <td>35</td>
+                            <td style="background-color: #d1fae5; font-weight:bold;">=PROMEDIO(B2:C2)</td>
+                        </tr>
+                        <tr>
+                            <td class="cell-header">3</td>
+                            <td style="text-align: left;">Total Aula</td>
+                            <td style="background-color: #d1fae5; font-weight:bold;">=SUMA(B2:B30)</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="cards-container" style="margin-top: 3vh;">
+                    <div class="card">
+                        <h3 class="card-title">Suma Automática</h3>
+                        <p class="card-desc">La función <span class="key-badge">SUMA</span> agrega varios valores al mismo tiempo y se actualiza si los datos cambian[cite: 9].</p>
+                    </div>
+                    <div class="card">
+                        <h3 class="card-title">Cálculo de Porcentajes</h3>
+                        <p class="card-desc">Permite dar diferente valor a cada actividad. Recuerda que el 30% se escribe como 0.30[cite: 9].</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: Gráficos -->
+            <div id="tab3" class="tab-content">
+                <h2 class="slide-title">Organización y Representación Gráfica</h2>
+                <p class="slide-text">Transformamos datos numéricos en recursos visuales para identificar tendencias de aprendizaje y analizar el rendimiento de los estudiantes[cite: 9].</p>
+                
+                <div class="highlight-box">
+                    <strong>🔀 Ordenamiento de Datos:</strong><br>
+                    Permite organizar la información de forma ascendente o descendente. ¡Asegúrese de seleccionar toda la tabla para no desordenar los registros de los estudiantes![cite: 9].
+                </div>
+
+                <div class="cards-container">
+                    <div class="card">
+                        <span class="card-icon">📊</span>
+                        <h3 class="card-title">Gráficos de Barras</h3>
+                        <p class="card-desc">Ideales para comparar datos entre diferentes categorías, como calificaciones por asignatura o rendimiento por grupo[cite: 9].</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">🥧</span>
+                        <h3 class="card-title">Gráficos Circulares</h3>
+                        <p class="card-desc">Representan proporciones, mostrando cómo se distribuye un total, como los porcentajes de aprobación o niveles de logro[cite: 9].</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: Avanzado -->
+            <div id="tab4" class="tab-content">
+                <h2 class="slide-title">Funciones de Automatización</h3>
+                <p class="slide-text">El registro pedagógico digital reduce el trabajo manual vinculando información y procesando datos instantáneamente[cite: 9].</p>
+                
+                <ul style="font-size: 1.6vw; line-height: 2; margin-left: 3vw; margin-top: 3vh;">
+                    <li>🔗 <strong>Vinculación de Celdas:</strong> Permite que un dato ingresado en una sección (como una calificación) se refleje y actualice automáticamente en otra hoja de resúmenes, evitando duplicación[cite: 9].</li>
+                    <li>🔤 <strong>Concatenación:</strong> Es una función que permite unir datos de diferentes celdas en una sola (Ej: Unir Nombres y Apellidos en una sola columna)[cite: 9].</li>
+                    <li>⚡ <strong>Generación Automática:</strong> Al modificar una calificación, el sistema recalcula de manera inmediata el promedio del estudiante y su estado de aprobación[cite: 9].</li>
+                </ul>
+
+                <div class="highlight-box" style="margin-top: 4vh;">
+                    <strong>Fórmula de Ejemplo:</strong> <span class="key-badge">=CONCATENAR(A2, ", ", B2)</span> unirá "Mamani" y "Juan" generando "Mamani, Juan"[cite: 9].
+                </div>
+            </div>
+
+            <!-- TAB 5: Protección -->
+            <div id="tab5" class="tab-content">
+                <h2 class="slide-title">Mantenimiento y Protección</h2>
+                <p class="slide-text">Un sistema automatizado requiere mantenimiento para prevenir errores que afecten los resultados o la toma de decisiones pedagógicas[cite: 9].</p>
+                
+                <div class="alert-box">
+                    <strong>⚠️ Identificación de Errores:</strong><br>
+                    Si ve resultados como celdas vacías o códigos de error, revise referencias incorrectas o la eliminación accidental de partes de la fórmula[cite: 9].
+                </div>
+                
+                <div class="cards-container">
+                    <div class="card">
+                        <span class="card-icon">🔒</span>
+                        <h3 class="card-title">Protección de Celdas</h3>
+                        <p class="card-desc">Es fundamental proteger las celdas que contienen cálculos, manteniendo habilitadas únicamente aquellas destinadas al ingreso de notas[cite: 9].</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">✅</span>
+                        <h3 class="card-title">Verificación</h3>
+                        <p class="card-desc">Compare resultados automáticos con cálculos manuales esporádicos para asegurar que las fórmulas sigan operando correctamente[cite: 9].</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 4vh; text-align: center;">
+                    <h3 style="color: var(--primary); font-size: 2vw;">¡Listo para automatizar el Cuaderno Pedagógico!</h3>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- JAVASCRIPT FOR INTERACTIVITY -->
+    <script>
+        function openTab(evt, tabId) {
+            // Ocultar todos los contenidos
+            var tabContents = document.getElementsByClassName("tab-content");
+            for (var i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+
+            // Quitar clase "active" de todos los botones
+            var tabBtns = document.getElementsByClassName("tab-btn");
+            for (var i = 0; i < tabBtns.length; i++) {
+                tabBtns[i].classList.remove("active");
+            }
+
+            // Mostrar el tab actual y añadir clase "active"
+            document.getElementById(tabId).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+</body>
+</html>
