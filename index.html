@@ -634,6 +634,13 @@
                 errorMsgContainer.style.display = "block";
                 return;
             }
+            // BLINDAJE LOCAL: Revisa si ya tiene una estrella guardada hoy en su teléfono
+            const successKey = `estrella_ganada_${codigo}_${hoy.getFullYear()}-${mesActual}-${diaActual}`;
+            if (localStorage.getItem(successKey) === "true") {
+                errorMsgContainer.innerText = "Ya ganaste tu estrella de hoy. ¡Buen trabajo, vuelve mañana!";
+                errorMsgContainer.style.display = "block";
+                return;
+            }
 
             errorMsgContainer.style.display = "none";
             btn.style.display = "none";
@@ -860,6 +867,12 @@
                 if (data.success) {
                     currentStudent.estrellas++;
                     document.getElementById('menu-student-stars').innerText = currentStudent.estrellas;
+                    
+                    // Guarda el candado local de victoria
+                    const hoy = new Date();
+                    const successKey = `estrella_ganada_${currentStudent.codigo}_${hoy.getFullYear()}-${hoy.getMonth() + 1}-${hoy.getDate()}`;
+                    localStorage.setItem(successKey, "true");
+                    
                     switchScreen('success-screen');
                 } else {
                     errorText.innerText = data.message;
