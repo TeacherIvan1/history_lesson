@@ -737,8 +737,10 @@
             switchScreen('quiz-screen');
         }
 
-        function seededRandom(seed) {
-            var x = Math.sin(seed++) * 10000;
+        // Generador de números pseudoaleatorios con semilla dinámica
+        let currentSeed = 0;
+        function seededRandom() {
+            var x = Math.sin(currentSeed++) * 10000;
             return x - Math.floor(x);
         }
 
@@ -763,17 +765,22 @@
             let bank = questionBank[cursoData];
             if (!bank || bank.length < 3) bank = questionBank["1ro Sec"]; 
 
-            let seed = dia; 
+            // Inicializamos la semilla global con el día y el código del estudiante
+            currentSeed = dia; 
             for (let i = 0; i < currentStudent.codigo.length; i++) {
-                seed += currentStudent.codigo.charCodeAt(i); 
+                currentSeed += currentStudent.codigo.charCodeAt(i); 
             }
 
-            let shuffledBank = [...bank].sort(() => 0.5 - seededRandom(seed));
+            // Clonar y mezclar el banco de preguntas (ahora la semilla se actualiza sola)
+            let shuffledBank = [...bank].sort(() => 0.5 - seededRandom());
+            
+            // Seleccionar exactamente 3 preguntas
             dailyQuestions = shuffledBank.slice(0, 3);
             
+            // Mezclar las opciones dentro de cada pregunta
             dailyQuestions.forEach(q => {
                 let optionsWithIndex = q.options.map((opt, index) => ({ opt, originalIndex: index }));
-                optionsWithIndex.sort(() => 0.5 - seededRandom(seed + 1));
+                optionsWithIndex.sort(() => 0.5 - seededRandom());
                 
                 q.shuffledOptions = optionsWithIndex.map(o => o.opt);
                 q.correctShuffledIndex = optionsWithIndex.findIndex(o => o.originalIndex === q.a);
